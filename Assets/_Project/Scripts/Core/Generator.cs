@@ -51,7 +51,20 @@ namespace Blockbloom.Core
         {
             if (g == null) throw new ArgumentNullException(nameof(g));
 
-            for (int i = 0; i < _catalog.Length; i++) _fits[i] = g.FitsAnywhere(_catalog[i]);
+            bool anyFits = false;
+            for (int i = 0; i < _catalog.Length; i++)
+            {
+                _fits[i] = g.FitsAnywhere(_catalog[i]);
+                if (_fits[i]) anyFits = true;
+            }
+            // RNG tuketilmeden once: hicbir parca sigmiyorsa garanti saglanamaz (QA B3; oyunda olusmaz,
+            // cunku tepsi yalniz bir patlatma ya da bos hucre birakan hamleden sonra yenilenir).
+            if (!anyFits)
+            {
+                throw new ArgumentException(g.Bits == ulong.MaxValue
+                    ? "Tahta tamamen dolu; hicbir parca sigmaz, tepsi garantisi (GDD §5.4) saglanamaz."
+                    : "Katalogdaki hicbir parca tahtaya sigmiyor; tepsi garantisi (GDD §5.4) saglanamaz.", nameof(g));
+            }
 
             // 1) Uc yuvayi sirayla cek; mevcutlar = 0..s-1
             for (int s = 0; s < CoreConfig.TraySlotCount; s++)
@@ -109,7 +122,14 @@ namespace Blockbloom.Core
                 _weights[i] = w;
                 total += w;
             }
-            if (total <= 0) throw new InvalidOperationException("Uretimde aday parca kalmadi (katalog/profil gecersiz).");
+            if (total <= 0)
+            {
+                // WeightProfile kurucusu ve NextTray basindaki denetim nedeniyle katalogla gelmez; ozel katalog/RNG icin guvence.
+                throw new InvalidOperationException(requireFit
+                    ? "Garanti onarimi: yuva " + excludeSlot + " icin tahtaya sigan uygun aday yok (asgari sigan " + prof.MinFitting
+                      + ", ayni parca en fazla " + CoreConfig.MaxSamePiecePerTray + " kez, buyuk siniri " + prof.MaxLarge + "). Profil veya katalog bu tahtada garantiyi saglayamiyor."
+                    : "Yuva " + existingCount + " icin agirligi pozitif uygun aday yok (katalog/profil gecersiz).");
+            }
 
             int r = _rng.NextInt(total);
             for (int i = 0; i < _catalog.Length; i++)

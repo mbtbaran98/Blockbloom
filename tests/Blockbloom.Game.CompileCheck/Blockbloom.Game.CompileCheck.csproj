@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Yeni Input System acik (Unity 6 yeni proje varsayilani): ENABLE_INPUT_SYSTEM. Bkz. CompileCheck.props -->
+  <Import Project="CompileCheck.props" />
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);UNITY_2021_1_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_INPUT_SYSTEM</DefineConstants>
+  </PropertyGroup>
+</Project>

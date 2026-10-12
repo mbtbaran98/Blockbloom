@@ -32,19 +32,21 @@ namespace Blockbloom.Core.Tests
         }
 
         [Test]
-        public void SingleEmptyCell_M1ClearsAllSixteenLines_ThenRefillsInOpenMode()
+        public void SingleEmptyCell_M1ClearsAllSixteenLines_GridLevel()
         {
-            // Oyunda olusamaz (dolu satirlar zaten patlardi) ama FromSnapshot kabul eder; en uc patlatma durumu.
-            GameState gs = Build(~Bit(4, 4), new[] { "M1", null, null });
-            MoveResult r = gs.TryPlace(0, 4, 4);
+            // Oyunda olusamaz (dolu satirlar zaten patlardi); FromSnapshot bunu artik reddeder (B2),
+            // ama Grid.FromBits izin verir: en uc patlatma durumu Grid + ScoreKeeper ile denetlenir.
+            Grid g = Grid.FromBits(~Bit(4, 4));
+            PlacementResult r = g.Place(PieceCatalog.Get("M1"), 4, 4, 1);
+            var sk = new ScoreKeeper();
+            ScoreBreakdown b = sk.Apply(r);
 
-            Assert.That(r.Placement.LineCount, Is.EqualTo(16));
-            Assert.That(r.Placement.CellsCleared, Is.EqualTo(64));
-            Assert.That(r.Placement.BoardCleared, Is.True);
-            Assert.That(r.Score.Total, Is.EqualTo(1 + 10 * 16 * 16 * 1 + 300));
-            Assert.That(r.TrayRefilled, Is.True);
-            Assert.That(r.NewTrayMode, Is.EqualTo(DifficultyMode.Open), "bos tahta + bu tepside patlatma -> T=0 -> ACIK");
-            Assert.That(gs.IsGameOver, Is.False);
+            Assert.That(r.LineCount, Is.EqualTo(16));
+            Assert.That(r.CellsCleared, Is.EqualTo(64));
+            Assert.That(r.BoardCleared, Is.True);
+            Assert.That(b.Total, Is.EqualTo(1 + 10 * 16 * 16 * 1 + 300));
+            Assert.That(g.IsEmpty, Is.True);
+            Assert.Throws<System.ArgumentException>(() => Build(~Bit(4, 4), new[] { "M1", null, null }));
         }
 
         [Test]

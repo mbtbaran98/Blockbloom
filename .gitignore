@@ -1,4 +1,5 @@
 # --- Unity (standart) ---
+# Commit EDILIR: Assets/ (+ tum .meta dosyalari), Packages/manifest.json, Packages/packages-lock.json, ProjectSettings/.
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -7,6 +8,8 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /[Mm]emoryCaptures/
+/.utmp/
+/[Aa]ssets/[Ss]treamingAssets/aa*
 /[Rr]ecordings/
 /Assets/Plugins/Editor/JetBrains*
 .vs/

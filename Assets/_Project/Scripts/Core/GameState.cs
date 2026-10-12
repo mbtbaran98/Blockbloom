@@ -173,8 +173,12 @@ namespace Blockbloom.Core
             if (s.TrayIds == null || s.TrayIds.Length != Tray.SlotCount || s.TrayColors == null || s.TrayColors.Length != Tray.SlotCount)
                 throw new ArgumentException("Tepsi verisi 3 oge olmali.", nameof(s));
             if (s.Stats == null) throw new ArgumentException("Stats bos olamaz.", nameof(s));
+            ValidateStats(s);
 
             Grid grid = Grid.FromRaw(s.Bits, s.Colors);
+            // Oyunda dolu satir/sutun hamle icinde hemen patlar; kayitta olamaz (QA B2: "hayalet" puan).
+            if (BitUtil.FullRows(s.Bits) != 0 || BitUtil.FullCols(s.Bits) != 0)
+                throw new ArgumentException("Tahtada tam dolu satir veya sutun var; gecerli bir oyun durumu degil.", nameof(s));
             var tray = new Tray();
             for (int i = 0; i < Tray.SlotCount; i++)
             {
@@ -186,12 +190,28 @@ namespace Blockbloom.Core
                 tray.Set(i, new TrayPiece(PieceCatalog.Get(s.TrayIds[i]), s.TrayColors[i]));
             }
             if (tray.IsEmpty) throw new ArgumentException("Tepside en az bir parca olmali (bos tepsi hamle icinde yenilenir).", nameof(s));
+            // Tepsi tam doluyken bu tepside henuz hamle yapilmamistir; patlatma olmus olamaz.
+            if (s.ClearedInCurrentTray && tray.RemainingCount == Tray.SlotCount)
+                throw new ArgumentException("Tepsi tam doluyken ClearedInCurrentTray true olamaz.", nameof(s));
 
             var gs = new GameState(s.Seed, Pcg32.FromState(s.RngState, s.RngInc), grid, tray,
                 new ScoreKeeper(s.Score, s.Combo, s.MaxCombo), new DifficultyState(s.TraysWithoutClear),
                 s.Stats.Clone(), s.ClearedInCurrentTray);
             gs.IsGameOver = !gs.AnySlotFits();
             return gs;
+        }
+
+        /// <summary>Skor ve istatistik alanlarinin oyun icinde korunan degismezleri (QA B2).</summary>
+        private static void ValidateStats(GameSnapshot s)
+        {
+            GameStats st = s.Stats;
+            if (s.Score < 0 || s.Combo < 0 || s.MaxCombo < s.Combo || s.TraysWithoutClear < 0)
+                throw new ArgumentException("Skor/kombo alanlari tutarsiz (Score >= 0, 0 <= Combo <= MaxCombo, T >= 0).", nameof(s));
+            if (st.Moves < 0 || st.LinesCleared < 0 || st.PerfectClears < 0 || st.TraysDealt < 1)
+                throw new ArgumentException("Istatistikler negatif olamaz; TraysDealt >= 1 olmali.", nameof(s));
+            // TryPlace her hamlede Stats.MaxCombo = Scoring.MaxCombo yazar; ikisi her zaman esittir.
+            if (st.MaxCombo != s.MaxCombo)
+                throw new ArgumentException("Stats.MaxCombo (" + st.MaxCombo + ") ile MaxCombo (" + s.MaxCombo + ") esit olmali.", nameof(s));
         }
 
         private bool AnySlotFits()

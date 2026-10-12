@@ -174,10 +174,11 @@ namespace Blockbloom.Core.Tests
         [Test]
         public void GameOver_ChecksPiecesIndividually_NotJointly()
         {
-            // tahtada tek bos hucre (dolu satir/sutun yok sayilir; Grid.FromRaw izin verir).
-            // Iki M1 ayri ayri sigar; birlikte sigmasalar da oyun bitmez.
-            ulong bits = ~Bit(4, 4) & ~0UL;
-            GameState gs = Build(bits, new[] { "M1", "M1", null });
+            // Dama tahtasinda (dolu satir/sutun yok) yalniz sol-ust 2x2 bos: O4 yalniz bir yere sigar.
+            // Iki O4 ayri ayri sigar; birlikte sigmasalar da oyun bitmez.
+            ulong bits = Checkerboard() & ~(Bit(0, 0) | Bit(1, 0) | Bit(0, 1) | Bit(1, 1));
+            GameState gs = Build(bits, new[] { "O4", "O4", null });
+            Assert.That(gs.Grid.ValidAnchors(PieceCatalog.Get("O4")).Count(), Is.EqualTo(1));
             Assert.That(gs.IsGameOver, Is.False);
         }
 

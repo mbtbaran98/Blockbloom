@@ -1,0 +1,30 @@
+<Project>
+  <!--
+    Unity tarafi (Blockbloom.Game + EditMode testleri) icin YALNIZ derleme kontrolu. Unity editoru olmadan
+    tip/uye adlarini ve C# 9 uyumunu denetler. Cikti kullanilmaz.
+    - UnityEngine.dll: NuGet Unity3D.SDK 2021.1.14.1 (Unity 2021.1 referans derlemesi; Unity 6'dan eski: Unity 6'ya
+      ozgu API yakalanmaz, Unity 6'da kaldirilmis API de yakalanmaz -> son dogrulama Unity'de).
+    - uGUI, Input System, TestRunner: Stubs/ altinda elle yazilmis imza taklitleri (gercek paket NuGet'te yok).
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>Blockbloom.Game.CompileCheck</AssemblyName>
+    <!-- Unity derlemesi mscorlib tabanli; netstandard ile birlestirirken cikan surum uyari kodlari -->
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;NU1701</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Scripts/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Scripts/Game/**/*.cs" Link="Game/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Tests/EditMode/**/*.cs" Link="EditModeTests/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stubs/*.cs" Link="Stubs/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Unity3D.SDK" Version="2021.1.14.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+  </ItemGroup>
+</Project>

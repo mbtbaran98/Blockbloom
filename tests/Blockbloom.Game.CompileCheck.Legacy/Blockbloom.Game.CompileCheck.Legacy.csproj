@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Yalniz eski Input Manager acik: ENABLE_LEGACY_INPUT_MANAGER. Kaynaklar ve ayarlar ortak props'tan. -->
+  <Import Project="../Blockbloom.Game.CompileCheck/CompileCheck.props" />
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);UNITY_2021_1_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_LEGACY_INPUT_MANAGER</DefineConstants>
+  </PropertyGroup>
+</Project>

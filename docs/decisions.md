@@ -71,3 +71,11 @@ Her karar: tarih, karar, gerekçe, sonuçlar. En yenisi en altta.
 - **Karar:** "Yeni rekor!" etiketi, oyun başlarken okunan rekora (`oyunBaşıRekor`) göre belirlenir: `sonSkor > oyunBaşıRekor`. Oyun sırasında veya arka plana alınırken rekor depoya yazılsa bile bu değer oyun boyunca değişmez. Sürdürülen oyunda Unity katmanı `oyunBaşıRekor`'u anlık görüntüyle birlikte saklar. HUD ve panel rekor alanı `max(oyunBaşıRekor, skor)` gösterir. Ayrıntı: GDD §7.2–7.3.
 - **Gerekçe:** Arka plana alma yazımı (GDD §7.3) rekoru oyun bitmeden günceller; depodaki güncel değerle karşılaştırılırsa oyuncu hak ettiği "Yeni rekor!" anını kaybeder (İ2: başarıya bağlı geri bildirim).
 - **Sonuçlar:** Core değişmez; kural Unity katmanında (UI/kayıt) uygulanır ve Unity Test Framework ile test edilir.
+
+## 2026-10-12 — M0 Unity katmanı ve Core sağlamlaştırma
+
+- **Karar:** Unity M0 sahneye bağımlı değil; `Bootstrap` (`RuntimeInitializeOnLoadMethod`) her şeyi kodla kurar, karolar çalışma anında prosedürel üretilir. M0'da yerleşik renderer (URP M1'de art-ui ile), metin için legacy uGUI `Text` (TMP yok), düğmeler için EventSystem yerine kendi isabet testi. Girdi: Input System, yalnız eski sistem açıksa eski `Input`.
+- **Core:** `WeightProfile` geçersiz değerleri reddeder (`minFitting = 0` artık geçersiz); `FromSnapshot` tutarsız kayıtları reddeder (`Stats.MaxCombo == MaxCombo` dahil); `NextTray` hiçbir parçanın sığmadığı tahtada RNG'ye dokunmadan atar. Bırakma çapası hesabı testlenebilsin diye Core'a taşındı (`DropAnchor`). Geçerli girdilerde üretim dizisi değişmedi (simülasyon V1 doğrulaması geçti).
+- **Kayıt:** Yarım oyun `SavedGameDto` v1 (PlayerPrefs `bb.savedGame.v1`, `bestAtStart` dahil), rekorlar `bb.records.*`.
+- **Doğrulama:** Unity editörü olmadığından Game kodu `Unity3D.SDK` (NuGet) + imza taklitleriyle iki girdi kipinde derleme kontrolünden geçirilir (`tests/Blockbloom.Game.CompileCheck*`, çözüm dışında). Unity 6'ya özgü API farklarını yakalamaz; yerel Unity doğrulaması şart.
+- **Gerekçe:** Bulut ortamında Unity editörü yok; sahne/prefab YAML'ı elle yazmak kırılgan. Ek paket ve içe aktarma adımı gerektirmeyen en kısa yol.

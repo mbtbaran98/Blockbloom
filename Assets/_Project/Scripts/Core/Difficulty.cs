@@ -27,14 +27,29 @@ namespace Blockbloom.Core
     /// <summary>Uretim agirlik profili (GDD §5.3). Carpanlar onda bir, tamsayi.</summary>
     public readonly struct WeightProfile
     {
+        /// <summary>
+        /// Gecersiz profil ArgumentOutOfRangeException ile reddedilir (QA B1). Kurallar her tahtada
+        /// garantinin (GDD §5.4) saglanabilmesi icindir:
+        /// - smallMul &gt;= 1: tek bos hucre kalsa bile M1 (K sinifi) aday olabilmeli.
+        /// - minFitting 1..MaxSamePiecePerTray: yalniz M1'in sigdigi tahtada ayni parca en fazla
+        ///   MaxSamePiecePerTray kez gelebildiginden daha buyuk asgari saglanamaz.
+        /// - mediumMul, largeMul &gt;= 0; fitMul &gt;= 1; maxLarge 0..3.
+        /// </summary>
         public WeightProfile(int smallMul, int mediumMul, int largeMul, int fitMul, int minFitting, int maxLarge)
         {
-            if (smallMul < 0 || mediumMul < 0 || largeMul < 0 || fitMul < 1)
-                throw new ArgumentOutOfRangeException(nameof(fitMul), "Carpanlar >= 0, fitMul >= 1 olmali.");
-            if (minFitting < 0 || minFitting > CoreConfig.TraySlotCount)
-                throw new ArgumentOutOfRangeException(nameof(minFitting));
+            if (smallMul < 1)
+                throw new ArgumentOutOfRangeException(nameof(smallMul), smallMul, "Kucuk sinif carpani >= 1 olmali (M1 her zaman aday olabilmeli).");
+            if (mediumMul < 0)
+                throw new ArgumentOutOfRangeException(nameof(mediumMul), mediumMul, "Orta sinif carpani >= 0 olmali.");
+            if (largeMul < 0)
+                throw new ArgumentOutOfRangeException(nameof(largeMul), largeMul, "Buyuk sinif carpani >= 0 olmali.");
+            if (fitMul < 1)
+                throw new ArgumentOutOfRangeException(nameof(fitMul), fitMul, "Sigma carpani >= 1 olmali.");
+            if (minFitting < 1 || minFitting > CoreConfig.MaxSamePiecePerTray)
+                throw new ArgumentOutOfRangeException(nameof(minFitting), minFitting,
+                    "Asgari sigan parca 1.." + CoreConfig.MaxSamePiecePerTray + " olmali (ayni parca bir tepside en fazla " + CoreConfig.MaxSamePiecePerTray + " kez gelir).");
             if (maxLarge < 0 || maxLarge > CoreConfig.TraySlotCount)
-                throw new ArgumentOutOfRangeException(nameof(maxLarge));
+                throw new ArgumentOutOfRangeException(nameof(maxLarge), maxLarge, "Buyuk parca siniri 0..3 olmali.");
             SmallMul = smallMul;
             MediumMul = mediumMul;
             LargeMul = largeMul;
