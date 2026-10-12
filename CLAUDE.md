@@ -1,10 +1,10 @@
-# Çini Blok — Proje Rehberi
+# Blockbloom — Proje Rehberi
 
 Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt ajanlar işe başlamadan önce bunu okur. Karar değiştiğinde önce bu dosya güncellenir.
 
 ## Vizyon
 
-8×8 ızgaralı, üç parçalı, satır/sütun patlatmalı bir blok bulmaca oyunu. Hedef: türün en "tatmin edici" hissettiren oyunu olmak. Çalışma adı **Çini Blok**; görsel kimlik İznik çinisinden ilham alır (kobalt, turkuaz, mercan kırmızısı, safran, yeşil, mor). Başka bir oyunun adı, logosu, görselleri veya marka unsurları kullanılmaz.
+8×8 ızgaralı, üç parçalı, satır/sütun patlatmalı bir blok bulmaca oyunu. Hedef: türün en "tatmin edici" hissettiren oyunu olmak. Oyunun adı **Blockbloom**; görsel kimlik İznik çinisinden ilham alır (kobalt, turkuaz, mercan kırmızısı, safran, yeşil, mor). Başka bir oyunun adı, logosu, görselleri veya marka unsurları kullanılmaz.
 
 ## Tasarım ilkeleri (araştırmadan türetildi — kaynaklar: `docs/research.md`)
 
@@ -20,8 +20,8 @@ Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt aj
 ## Teknik yığın (karar: 2026-10-12, bkz. `docs/decisions.md`)
 
 - **Unity 6 LTS (6000.0.x) + C#**, 2D URP. iOS/Android derlemesi doğrudan Unity'den; ayrı paketleyici yok.
-- Oyun mantığı (ızgara, yerleştirme, puan, parça üretimi, zorluk) **saf C#**: `CiniBlok.Core` assembly'si, `noEngineReferences: true`. `UnityEngine` kullanmaz; C# 9 ile sınırlı (Unity uyumu).
-- Core, Unity editörü olmadan terminalden test edilir: `dotnet test tests/CiniBlok.Core.Tests` (NUnit, .NET 8). Test projesi Core kaynak dosyalarını doğrudan derler; aynı dosyalar Unity'de de kullanılır.
+- Oyun mantığı (ızgara, yerleştirme, puan, parça üretimi, zorluk) **saf C#**: `Blockbloom.Core` assembly'si, `noEngineReferences: true`. `UnityEngine` kullanmaz; C# 9 ile sınırlı (Unity uyumu).
+- Core, Unity editörü olmadan terminalden test edilir: `dotnet test tests/Blockbloom.Core.Tests` (NUnit, .NET 8). Test projesi Core kaynak dosyalarını doğrudan derler; aynı dosyalar Unity'de de kullanılır.
 - Bağımlılık yönü tek: Unity kodu (sahneler, girdi, efekt, UI) Core'u kullanır, Core Unity'yi bilmez. Unity tarafı testleri: Unity Test Framework (EditMode/PlayMode).
 - Ortam sınırı: bulut oturumunda Unity editörü ve lisansı yok. Sahne, prefab ve derleme yerel makinede Unity ile doğrulanır. Ajanlar sahne/prefab YAML'ını elle yazmak yerine kodla kurulumu (ör. sahneyi çalışma anında kuran `Bootstrap` bileşeni, editör menü komutu) tercih eder.
 - Hızlı deneme: Unity editöründe Play; paylaşım için WebGL derlemesi.
@@ -29,14 +29,14 @@ Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt aj
 ## Klasör yapısı (hedef)
 
 ```
-Assets/_Project/Scripts/Core/    # saf C# oyun mantığı (CiniBlok.Core.asmdef): grid, pieces, scoring, generator, difficulty
+Assets/_Project/Scripts/Core/    # saf C# oyun mantığı (Blockbloom.Core.asmdef): grid, pieces, scoring, generator, difficulty
 Assets/_Project/Scripts/Game/    # Unity bileşenleri: girdi, sürükle-bırak, tahta görünümü
 Assets/_Project/Scripts/Fx/      # efekt, ses, titreşim (juice) katmanı
 Assets/_Project/Scripts/UI/      # HUD, menüler
 Assets/_Project/Scenes/          # Boot, Menu, Game
 Assets/_Project/Art/, Audio/     # görsel ve ses
 Assets/_Project/Tests/           # Unity Test Framework (EditMode/PlayMode)
-tests/CiniBlok.Core.Tests/       # Core terminal testleri (dotnet test, NUnit)
+tests/Blockbloom.Core.Tests/       # Core terminal testleri (dotnet test, NUnit)
 tools/                           # denge simülasyonu vb. (dotnet konsol)
 docs/                            # GDD, araştırma, karar kayıtları
 ```

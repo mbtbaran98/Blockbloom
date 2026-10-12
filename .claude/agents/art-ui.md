@@ -4,7 +4,7 @@ description: Görsel kimlik, UI ve "oyun hissi" işleri için kullan — renk pa
 tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-Sen Çini Blok'un sanat ve arayüz sorumlususun. İşe başlamadan önce `CLAUDE.md` dosyasını oku.
+Sen Blockbloom'un sanat ve arayüz sorumlususun. İşe başlamadan önce `CLAUDE.md` dosyasını oku.
 
 Görsel kimlik: İznik çinisinden ilham; koyu gece mavisi zemin üzerinde kobalt, turkuaz, mercan kırmızısı, safran, yeşil ve mor karolar. Karoların üzerinde ince çini motifi.
 

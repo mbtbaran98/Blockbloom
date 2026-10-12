@@ -1,4 +1,4 @@
-# Çini Blok — Oyun Tasarım Belgesi (GDD)
+# Blockbloom — Oyun Tasarım Belgesi (GDD)
 
 - **Sürüm:** v0.1 — 2026-10-12
 - **Kapsam:** M0 (çekirdek oyun, klasik mod). M1–M4 yalnızca §12'de listelenir.
@@ -276,12 +276,12 @@ Tüm süre/mesafe değerleri yapılandırılabilir sabittir. Birim "hücre" = ta
 
 ---
 
-## 9. Core API önerisi (`CiniBlok.Core`, saf C# 9, `UnityEngine` yok)
+## 9. Core API önerisi (`Blockbloom.Core`, saf C# 9, `UnityEngine` yok)
 
 Yalnızca imzalar ve davranış. Koleksiyonlar dışarıya salt okunur verilir. Hata durumunda (geçersiz yuva vb.) istisna değil, sonuç nesnesi döndürülür.
 
 ```
-namespace CiniBlok.Core
+namespace Blockbloom.Core
 
 readonly struct Cell { int X; int Y; }                         // x sağa, y aşağı
 
