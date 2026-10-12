@@ -17,22 +17,28 @@ Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt aj
 7. **Dürüst pazarlama.** Reklamlar gerçek oynanışı gösterir. Yanıltıcı reklam en hızlı kopan oyuncuyu getirir.
 8. **Hafif ve hızlı.** Düşük donanımlı cihazda 60 fps, küçük indirme boyutu.
 
-## Teknik yığın (varsayılan — değiştirmek için bu bölümü güncelle)
+## Teknik yığın (karar: 2026-10-12, bkz. `docs/decisions.md`)
 
-- **TypeScript + Phaser 3** (oyun), **Vite** (derleme), **Capacitor** (iOS/Android paketleme).
-- Neden: tamamen terminalden derlenir, test edilir ve tarayıcıda denenir; editör arayüzü gerektirmez. Alternatifler: Godot 4 (GDScript), Unity (C#).
-- Oyun mantığı (ızgara, yerleştirme, puan, parça üretimi) **saf TypeScript modüllerinde**, Phaser'dan bağımsız ve birim testli (Vitest).
+- **Unity 6 LTS (6000.0.x) + C#**, 2D URP. iOS/Android derlemesi doğrudan Unity'den; ayrı paketleyici yok.
+- Oyun mantığı (ızgara, yerleştirme, puan, parça üretimi, zorluk) **saf C#**: `CiniBlok.Core` assembly'si, `noEngineReferences: true`. `UnityEngine` kullanmaz; C# 9 ile sınırlı (Unity uyumu).
+- Core, Unity editörü olmadan terminalden test edilir: `dotnet test tests/CiniBlok.Core.Tests` (NUnit, .NET 8). Test projesi Core kaynak dosyalarını doğrudan derler; aynı dosyalar Unity'de de kullanılır.
+- Bağımlılık yönü tek: Unity kodu (sahneler, girdi, efekt, UI) Core'u kullanır, Core Unity'yi bilmez. Unity tarafı testleri: Unity Test Framework (EditMode/PlayMode).
+- Ortam sınırı: bulut oturumunda Unity editörü ve lisansı yok. Sahne, prefab ve derleme yerel makinede Unity ile doğrulanır. Ajanlar sahne/prefab YAML'ını elle yazmak yerine kodla kurulumu (ör. sahneyi çalışma anında kuran `Bootstrap` bileşeni, editör menü komutu) tercih eder.
+- Hızlı deneme: Unity editöründe Play; paylaşım için WebGL derlemesi.
 
 ## Klasör yapısı (hedef)
 
 ```
-src/core/      # saf oyun mantığı: grid, pieces, scoring, generator, difficulty
-src/scenes/    # Phaser sahneleri: Boot, Menu, Game, GameOver
-src/fx/        # efekt, ses, titreşim (juice) katmanı
-src/ui/        # HUD, menüler
-assets/        # görsel ve ses
-tests/         # Vitest birim testleri
-docs/          # GDD, araştırma, karar kayıtları
+Assets/_Project/Scripts/Core/    # saf C# oyun mantığı (CiniBlok.Core.asmdef): grid, pieces, scoring, generator, difficulty
+Assets/_Project/Scripts/Game/    # Unity bileşenleri: girdi, sürükle-bırak, tahta görünümü
+Assets/_Project/Scripts/Fx/      # efekt, ses, titreşim (juice) katmanı
+Assets/_Project/Scripts/UI/      # HUD, menüler
+Assets/_Project/Scenes/          # Boot, Menu, Game
+Assets/_Project/Art/, Audio/     # görsel ve ses
+Assets/_Project/Tests/           # Unity Test Framework (EditMode/PlayMode)
+tests/CiniBlok.Core.Tests/       # Core terminal testleri (dotnet test, NUnit)
+tools/                           # denge simülasyonu vb. (dotnet konsol)
+docs/                            # GDD, araştırma, karar kayıtları
 ```
 
 ## Puanlama (başlangıç değerleri — denge testleriyle ayarlanır)
@@ -56,13 +62,13 @@ Koordinatör (ana oturum) işi böler, ilgili alt ajana verir, çıktıyı kontr
 Kurallar:
 - Her alt ajan sıfırdan başlar: görev verirken ilgili dosyaları ve kabul kriterini açıkça yaz.
 - Kararlar `docs/decisions.md` dosyasına tarih ve gerekçeyle eklenir.
-- `src/core` değişikliği testsiz birleştirilmez.
+- Core (`Assets/_Project/Scripts/Core`) değişikliği testsiz birleştirilmez; `dotnet test` geçmeden commit yok.
 - Başka oyunlardan kod, görsel, isim veya ses kopyalanmaz.
 
 ## Yol haritası
 
-1. **M0 – Çekirdek:** ızgara, üç parçalı tepsi, sürükle-bırak, patlatma, puan, oyun sonu. Birim testleri.
+1. **M0 – Çekirdek:** ızgara, üç parçalı tepsi, sürükle-bırak, patlatma, puan, oyun sonu. Core birim testleri (`dotnet test`) + Unity'de oynanabilir sahne.
 2. **M1 – His:** efektler, ses, titreşim, kombo geri bildirimi. Telefonda test.
 3. **M2 – İçerik:** macera modu (açılan resim), günlük bulmaca, zorluk ayarı.
 4. **M3 – Gelir ve analitik:** ödüllü reklam, reklamsız satın alma, olay takibi.
-5. **M4 – Yayın:** Capacitor build, mağaza sayfası, soft launch.
+5. **M4 – Yayın:** Unity iOS/Android build, mağaza sayfası, soft launch.
