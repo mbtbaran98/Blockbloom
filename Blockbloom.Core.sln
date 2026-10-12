@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3C91B897-BB19-43CA-9B93-0D649D0DEDE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blockbloom.Core.Tests", "tests\Blockbloom.Core.Tests\Blockbloom.Core.Tests.csproj", "{FF9342C8-CD92-47C2-8D76-2FA454EA9127}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blockbloom.Core.Compat", "tests\Blockbloom.Core.Compat\Blockbloom.Core.Compat.csproj", "{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF9342C8-CD92-47C2-8D76-2FA454EA9127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF9342C8-CD92-47C2-8D76-2FA454EA9127}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF9342C8-CD92-47C2-8D76-2FA454EA9127}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF9342C8-CD92-47C2-8D76-2FA454EA9127}.Release|Any CPU.Build.0 = Release|Any CPU
+		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FF9342C8-CD92-47C2-8D76-2FA454EA9127} = {3C91B897-BB19-43CA-9B93-0D649D0DEDE0}
+		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD} = {3C91B897-BB19-43CA-9B93-0D649D0DEDE0}
+	EndGlobalSection
+EndGlobal

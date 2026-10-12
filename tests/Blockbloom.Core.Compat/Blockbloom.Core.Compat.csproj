@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unity uyumluluk denetimi: Core kaynaklarini Unity 6'nin API yuzeyi olan netstandard2.1
+    ve C# 9 ile derler. .NET 8'e ozgu API (ornegin BitOperations) veya C# 10+ ozelligi
+    kullanilirsa derleme burada kirilir. Cikti hicbir yerde kullanilmaz.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>Blockbloom.Core</AssemblyName>
+    <RootNamespace>Blockbloom.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/_Project/Scripts/Core/**/*.cs" />
+  </ItemGroup>
+</Project>
