@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blockbloom.Core.Tests", "te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blockbloom.Core.Compat", "tests\Blockbloom.Core.Compat\Blockbloom.Core.Compat.csproj", "{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{811D2E01-C08F-4E31-8565-E98529ED9FEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blockbloom.Sim", "tools\Blockbloom.Sim\Blockbloom.Sim.csproj", "{A3E23AAB-AB14-4907-BA24-5F462D45DA8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,14 @@ Global
 		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3E23AAB-AB14-4907-BA24-5F462D45DA8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3E23AAB-AB14-4907-BA24-5F462D45DA8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3E23AAB-AB14-4907-BA24-5F462D45DA8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3E23AAB-AB14-4907-BA24-5F462D45DA8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FF9342C8-CD92-47C2-8D76-2FA454EA9127} = {3C91B897-BB19-43CA-9B93-0D649D0DEDE0}
 		{085EFDCF-8F72-4DDA-BAC7-DF800017E9BD} = {3C91B897-BB19-43CA-9B93-0D649D0DEDE0}
+		{A3E23AAB-AB14-4907-BA24-5F462D45DA8F} = {811D2E01-C08F-4E31-8565-E98529ED9FEB}
 	EndGlobalSection
 EndGlobal

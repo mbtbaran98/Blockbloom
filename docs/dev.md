@@ -8,7 +8,8 @@
 | `Assets/_Project/Scripts/Core/CoreConfig.cs` | Tüm ayarlanabilir sabitler (puan, zorluk eşikleri/çarpanları). Denge ayarı buradan yapılır. |
 | `tests/Blockbloom.Core.Tests/` | NUnit testleri (net8.0, C# 9). Core kaynaklarını doğrudan derler. |
 | `tests/Blockbloom.Core.Compat/` | Uyumluluk denetimi: aynı Core kaynaklarını **netstandard2.1 + C# 9** ile derler (Unity 6'nın API yüzeyi). Çıktısı kullanılmaz; uyarılar hata sayılır. |
-| `Blockbloom.Core.sln` | Yukarıdaki iki proje (ileride `tools/` projeleri de buraya eklenir). Unity kökte kendi `Blockbloom.sln` dosyasını ürettiği için ad bilerek farklı. |
+| `tools/Blockbloom.Sim/` | Denge simülasyonu (net8.0 konsol, GDD §10). Core kaynaklarını doğrudan derler; Core'u değiştirmez. Rapor: `docs/reports/m0-balance.md`. |
+| `Blockbloom.Core.sln` | Yukarıdaki projeler. Unity kökte kendi `Blockbloom.sln` dosyasını ürettiği için ad bilerek farklı. |
 
 ## Testleri çalıştırma
 
@@ -20,6 +21,17 @@ dotnet test tests/Blockbloom.Core.Tests     # ya da: dotnet test Blockbloom.Core
 - Gereken: .NET 8 SDK. NuGet: NUnit 4, NUnit3TestAdapter, Microsoft.NET.Test.Sdk.
 - Tek test: `dotnet test tests/Blockbloom.Core.Tests --filter "FullyQualifiedName~Gdd_6_4"`.
 - Performans çıktısı: `--logger "console;verbosity=detailed"` ile `Ortalama tepsi uretimi` satırı görünür.
+
+## Denge simülasyonu
+
+```bash
+dotnet run -c Release --project tools/Blockbloom.Sim -- --games 1000 --seed-start 1 --bot random,greedy,smart,planner --difficulty all --sweep
+dotnet run -c Release --project tools/Blockbloom.Sim -- --help   # tüm seçenekler
+```
+
+- Varsayılan çıktı `docs/reports/m0-balance.json`. Çıkış kodu 1 = GDD §10'daki kesin bir kriter kaldı.
+- `random`/`greedy` GDD §10 botlarıdır; `smart`/`planner` yalnız bilgi amaçlıdır (S kriterlerine girmez; `planner` yavaştır, 1.000 oyun birkaç dakika).
+- `--difficulty off` ve `--sweep` ince bir döngüyle (`Grid` + `Generator.NextTray(grid, profil)` + `ScoreKeeper`) çalışır; bu döngünün zorluk açıkken `GameState` ile birebir aynı olduğu her koşuda denetlenir.
 
 ## Core kuralları
 

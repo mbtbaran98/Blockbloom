@@ -1,0 +1,887 @@
+{
+  "tool": "tools/Blockbloom.Sim",
+  "generatedUtc": "2026-10-12T08:19:15Z",
+  "environment": {
+    "dotnet": "8.0.31",
+    "os": "Ubuntu 24.04.5 LTS",
+    "processorCount": 4
+  },
+  "options": {
+    "games": 300,
+    "seedStart": 1,
+    "bots": [
+      "Greedy"
+    ],
+    "difficulty": [
+      "on"
+    ],
+    "maxMoves": 5000,
+    "verify": false,
+    "randomBotSeedOffset": 1000000
+  },
+  "pureTiming": {
+    "games": 0,
+    "seconds": null
+  },
+  "thinLoopVsGameState": [],
+  "criteria": [
+    {
+      "id": "S1",
+      "metric": "Yeni tepside hic sigan yok orani",
+      "target": "= 0",
+      "type": "Kesin",
+      "value": "0/5648",
+      "result": "GECTI"
+    },
+    {
+      "id": "V2",
+      "metric": "Tepsi kurallari (ayni kimlik \u003C= 2, mod B siniri)",
+      "target": "= 0",
+      "type": "Dogrulama",
+      "value": "0/5648",
+      "result": "GECTI"
+    },
+    {
+      "id": "S2",
+      "metric": "RAHATLATMA\u0027da \u003C2 sigan orani",
+      "target": "= 0",
+      "type": "Kesin",
+      "value": "0/1337",
+      "result": "GECTI"
+    },
+    {
+      "id": "S3",
+      "metric": "Determinizm \u002B anlik goruntuden devam",
+      "target": "%100",
+      "type": "Kesin",
+      "value": "tekrar 0/0, devam 0/0",
+      "result": "OLCULMEDI"
+    },
+    {
+      "id": "S4",
+      "metric": "Puan muhasebesi \u002B kesisim formulu",
+      "target": "%100",
+      "type": "Kesin",
+      "value": "0 hata / 16616 hamle",
+      "result": "GECTI"
+    },
+    {
+      "id": "S5",
+      "metric": "Rastgele - ortalama hamle",
+      "target": "20-60",
+      "type": "Tahmin",
+      "value": null,
+      "result": "OLCULMEDI"
+    },
+    {
+      "id": "S6",
+      "metric": "Acgozlu - ortalama hamle",
+      "target": "150-800",
+      "type": "Tahmin",
+      "value": "55.39",
+      "result": "KALDI"
+    },
+    {
+      "id": "S7",
+      "metric": "Acgozlu/rastgele ortalama skor",
+      "target": "\u003E= 5",
+      "type": "Tahmin",
+      "value": "NaN",
+      "result": "OLCULMEDI"
+    },
+    {
+      "id": "S8",
+      "metric": "Acgozlu \u003C= 9 hamlede biten",
+      "target": "\u003C= %2",
+      "type": "Tahmin",
+      "value": "0.00%",
+      "result": "GECTI"
+    },
+    {
+      "id": "S9",
+      "metric": "Acgozlu bitmedi (tavan)",
+      "target": "\u003C= %1",
+      "type": "Tahmin",
+      "value": "0.00%",
+      "result": "GECTI"
+    },
+    {
+      "id": "S10",
+      "metric": "Acgozlu mod paylari",
+      "target": "RAHAT %10-35, ACIK %10-40",
+      "type": "Tahmin",
+      "value": "RAHAT 23.67%, ACIK 15.08%, NORMAL 61.24%",
+      "result": "GECTI"
+    },
+    {
+      "id": "S11",
+      "metric": "Acgozlu patlatan hamle orani",
+      "target": "%20-45",
+      "type": "Tahmin",
+      "value": "37.46%",
+      "result": "GECTI"
+    },
+    {
+      "id": "S12",
+      "metric": "Acgozlu en yuksek kombo medyani",
+      "target": "\u003E= 3",
+      "type": "Tahmin",
+      "value": "3",
+      "result": "GECTI"
+    },
+    {
+      "id": "S13",
+      "metric": "Zorluk acik/kapali acgozlu hamle orani",
+      "target": "1,15-2,0",
+      "type": "Tahmin",
+      "value": "NaN",
+      "result": "OLCULMEDI"
+    },
+    {
+      "id": "S15",
+      "metric": "Tepsi uretimi ort. \u003C 0,1 ms; 2.000 oyun \u003C 60 s",
+      "target": "\u003C 100 us; \u003C 60 s",
+      "type": "Kesin",
+      "value": "ort NaN us (0 tepsi); saf kosu 0 oyun NaN s",
+      "result": "OLCULMEDI"
+    },
+    {
+      "id": "V1",
+      "metric": "Ince dongu (zorluk acik) = GameState",
+      "target": "%100",
+      "type": "Dogrulama",
+      "value": "bagimsiz 0/0; golge 0/0",
+      "result": "OLCULMEDI"
+    }
+  ],
+  "runs": [
+    {
+      "name": "greedy-on",
+      "bot": "Greedy",
+      "difficulty": "on",
+      "engine": "GameState",
+      "games": 300,
+      "wallSeconds": 0.239,
+      "moves": {
+        "mean": 55.387,
+        "median": 47,
+        "p10": 23,
+        "p90": 95,
+        "p99": 176,
+        "min": 11,
+        "max": 200
+      },
+      "score": {
+        "mean": 535.53,
+        "median": 465,
+        "p10": 184,
+        "p90": 988,
+        "p99": 1971,
+        "min": 75,
+        "max": 2096
+      },
+      "linesCleared": {
+        "mean": 21.52,
+        "median": 18,
+        "p10": 7,
+        "p90": 40,
+        "p99": 75,
+        "min": 2,
+        "max": 88
+      },
+      "maxCombo": {
+        "mean": 2.867,
+        "median": 3,
+        "p10": 2,
+        "p90": 4,
+        "p99": 5,
+        "min": 1,
+        "max": 6
+      },
+      "perfectClears": {
+        "mean": 0.033,
+        "median": 0,
+        "p10": 0,
+        "p90": 0,
+        "p99": 1,
+        "min": 0,
+        "max": 1
+      },
+      "traysDealt": {
+        "mean": 18.827,
+        "median": 16,
+        "p10": 8,
+        "p90": 32,
+        "p99": 59,
+        "min": 4,
+        "max": 67
+      },
+      "maxComboHistogram": {
+        "1": 9,
+        "2": 101,
+        "3": 126,
+        "4": 50,
+        "5": 13,
+        "6": 1
+      },
+      "gamesWithPerfectClearPct": 3.333,
+      "perfectClearPerMovePct": 0.06,
+      "cappedGames": 0,
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "endRemainingPieces_0_1_2_3": [
+        0,
+        272,
+        28,
+        0
+      ],
+      "totalMoves": 16616,
+      "clearingMovePct": 37.458,
+      "lineCountShareOfClearingMovesPct": {
+        "1": 96.417,
+        "2": 3.438,
+        "3": 0.145,
+        "4\u002B": 0
+      },
+      "lineCountRaw": {
+        "1": 6001,
+        "2": 214,
+        "3": 9
+      },
+      "rowAndColSameMovePctOfClearing": 1.189,
+      "totalTrays": 5648,
+      "modes": {
+        "Open": {
+          "trays": 852,
+          "sharePct": 15.085,
+          "meanFilledAtDeal": 7.13,
+          "fittingAtDeal_0_1_2_3": [
+            0,
+            0,
+            0,
+            852
+          ],
+          "traysWithRepair": 0,
+          "pieceFreqPct": {
+            "M1": 2.621,
+            "I2H": 3.912,
+            "I2V": 3.795,
+            "I3H": 3.638,
+            "I3V": 4.03,
+            "V3A": 2.582,
+            "V3B": 2.074,
+            "V3C": 2.621,
+            "V3D": 2.66,
+            "I4H": 4.304,
+            "I4V": 4.851,
+            "O4": 6.025,
+            "T4U": 2.465,
+            "T4D": 2.7,
+            "T4L": 2.269,
+            "T4R": 2.543,
+            "S4H": 0.939,
+            "S4V": 1.487,
+            "Z4H": 2.034,
+            "Z4V": 1.839,
+            "L4A": 1.721,
+            "L4B": 1.956,
+            "L4C": 1.761,
+            "L4D": 1.369,
+            "J4A": 1.604,
+            "J4B": 1.604,
+            "J4C": 1.604,
+            "J4D": 1.878,
+            "I5H": 4.264,
+            "I5V": 4.382,
+            "V5A": 1.839,
+            "V5B": 1.917,
+            "V5C": 2.23,
+            "V5D": 2.152,
+            "R6H": 3.326,
+            "R6V": 2.504,
+            "O9": 4.499
+          }
+        },
+        "Normal": {
+          "trays": 3459,
+          "sharePct": 61.243,
+          "meanFilledAtDeal": 23.53,
+          "fittingAtDeal_0_1_2_3": [
+            0,
+            10,
+            171,
+            3278
+          ],
+          "traysWithRepair": 0,
+          "pieceFreqPct": {
+            "M1": 3.344,
+            "I2H": 4.703,
+            "I2V": 4.78,
+            "I3H": 4.934,
+            "I3V": 4.722,
+            "V3A": 3.248,
+            "V3B": 3.103,
+            "V3C": 3.151,
+            "V3D": 2.833,
+            "I4H": 4.202,
+            "I4V": 3.932,
+            "O4": 6.543,
+            "T4U": 2.506,
+            "T4D": 2.322,
+            "T4L": 2.149,
+            "T4R": 2.438,
+            "S4H": 1.648,
+            "S4V": 1.542,
+            "Z4H": 1.754,
+            "Z4V": 1.446,
+            "L4A": 1.802,
+            "L4B": 1.648,
+            "L4C": 1.802,
+            "L4D": 1.58,
+            "J4A": 1.465,
+            "J4B": 1.735,
+            "J4C": 1.561,
+            "J4D": 1.918,
+            "I5H": 3.17,
+            "I5V": 3.007,
+            "V5A": 1.764,
+            "V5B": 1.966,
+            "V5C": 1.677,
+            "V5D": 1.513,
+            "R6H": 2.351,
+            "R6V": 2.592,
+            "O9": 3.151
+          }
+        },
+        "Relief": {
+          "trays": 1337,
+          "sharePct": 23.672,
+          "meanFilledAtDeal": 35.18,
+          "fittingAtDeal_0_1_2_3": [
+            0,
+            0,
+            150,
+            1187
+          ],
+          "traysWithRepair": 0,
+          "pieceFreqPct": {
+            "M1": 4.812,
+            "I2H": 7.479,
+            "I2V": 7.704,
+            "I3H": 7.43,
+            "I3V": 7.081,
+            "V3A": 4.388,
+            "V3B": 5.51,
+            "V3C": 5.086,
+            "V3D": 5.011,
+            "I4H": 4.363,
+            "I4V": 3.465,
+            "O4": 6.033,
+            "T4U": 2.094,
+            "T4D": 2.069,
+            "T4L": 2.119,
+            "T4R": 1.745,
+            "S4H": 1.621,
+            "S4V": 1.546,
+            "Z4H": 1.396,
+            "Z4V": 1.396,
+            "L4A": 1.471,
+            "L4B": 1.321,
+            "L4C": 1.496,
+            "L4D": 1.521,
+            "J4A": 1.147,
+            "J4B": 1.67,
+            "J4C": 1.521,
+            "J4D": 1.546,
+            "I5H": 0.947,
+            "I5V": 0.873,
+            "V5A": 0.499,
+            "V5B": 0.598,
+            "V5C": 0.474,
+            "V5D": 0.499,
+            "R6H": 0.623,
+            "R6V": 0.648,
+            "O9": 0.798
+          }
+        }
+      },
+      "reliefTrigger": {
+        "filledOnly": 1221,
+        "tOnly": 72,
+        "both": 44
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "trayRuleViolations": 0,
+      "trayGenMicros": null,
+      "s14_normalFreqNoRepair": null,
+      "checks": {
+        "scoreSumMismatch": 0,
+        "cellsClearedFormulaMismatch": 0,
+        "statsMismatch": 0,
+        "greedyPredictionMismatch": 0,
+        "zeroLegalMovesButNotOver": 0,
+        "shadowCheckedGames": 0,
+        "shadowMismatchGames": 0,
+        "determinismChecked": 0,
+        "determinismMismatch": 0,
+        "resumeChecked": 0,
+        "resumeMismatch": 0,
+        "errors": []
+      }
+    }
+  ],
+  "sweep": [
+    {
+      "variant": "baseline",
+      "description": "GDD v0.1 / CoreConfig (zorluk acik)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 189.473,
+      "moves": {
+        "mean": 189.473,
+        "median": 134,
+        "p10": 52,
+        "p90": 407,
+        "p99": 680,
+        "min": 20,
+        "max": 800
+      },
+      "meanScore": 2231.927,
+      "score": {
+        "mean": 2231.927,
+        "median": 1556,
+        "p10": 538,
+        "p90": 4989,
+        "p99": 7975,
+        "min": 145,
+        "max": 10146
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.47,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 26.346,
+        "Normal": 70.158,
+        "Relief": 3.495
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 78.998
+    },
+    {
+      "variant": "off",
+      "description": "Zorluk kapali: her tepsi NORMAL",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 151.01,
+      "moves": {
+        "mean": 151.01,
+        "median": 125,
+        "p10": 41,
+        "p90": 305,
+        "p99": 515,
+        "min": 14,
+        "max": 803
+      },
+      "meanScore": 1716.713,
+      "score": {
+        "mean": 1716.713,
+        "median": 1387,
+        "p10": 427,
+        "p90": 3588,
+        "p99": 6027,
+        "min": 121,
+        "max": 9288
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 37.812,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 0,
+        "Normal": 100,
+        "Relief": 0
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 77.233
+    },
+    {
+      "variant": "relief28",
+      "description": "RAHATLATMA esigi dolu \u003E= 28 (GDD \u00A710: S6 dusukse)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 242.937,
+      "moves": {
+        "mean": 242.937,
+        "median": 173,
+        "p10": 47,
+        "p90": 551,
+        "p99": 1082,
+        "min": 20,
+        "max": 1349
+      },
+      "meanScore": 2849.953,
+      "score": {
+        "mean": 2849.953,
+        "median": 1972,
+        "p10": 538,
+        "p90": 6409,
+        "p99": 13443,
+        "min": 145,
+        "max": 16222
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.443,
+      "maxComboMedian": 3,
+      "maxComboP99": 6,
+      "modeSharePct": {
+        "Open": 24.96,
+        "Normal": 66.113,
+        "Relief": 8.927
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 89.925
+    },
+    {
+      "variant": "relief24",
+      "description": "RAHATLATMA esigi dolu \u003E= 24",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 343.347,
+      "moves": {
+        "mean": 343.347,
+        "median": 263,
+        "p10": 59,
+        "p90": 734,
+        "p99": 1328,
+        "min": 20,
+        "max": 1829
+      },
+      "meanScore": 3944.087,
+      "score": {
+        "mean": 3944.087,
+        "median": 2914,
+        "p10": 672,
+        "p90": 8354,
+        "p99": 15261,
+        "min": 162,
+        "max": 21389
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.382,
+      "maxComboMedian": 3,
+      "maxComboP99": 6,
+      "modeSharePct": {
+        "Open": 23.47,
+        "Normal": 54.47,
+        "Relief": 22.059
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 124.545
+    },
+    {
+      "variant": "reliefT1",
+      "description": "RAHATLATMA T \u003E= 1",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 193.483,
+      "moves": {
+        "mean": 193.483,
+        "median": 146,
+        "p10": 47,
+        "p90": 401,
+        "p99": 695,
+        "min": 14,
+        "max": 836
+      },
+      "meanScore": 2275.057,
+      "score": {
+        "mean": 2275.057,
+        "median": 1657,
+        "p10": 472,
+        "p90": 4790,
+        "p99": 7996,
+        "min": 125,
+        "max": 10325
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.367,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 25.576,
+        "Normal": 69.166,
+        "Relief": 5.258
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 79.832
+    },
+    {
+      "variant": "reliefFit2",
+      "description": "RAHATLATMA sigma carpani 3 -\u003E 2 (GDD \u00A710: S6/S9 yuksekse)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 183.887,
+      "moves": {
+        "mean": 183.887,
+        "median": 134,
+        "p10": 47,
+        "p90": 374,
+        "p99": 626,
+        "min": 20,
+        "max": 1076
+      },
+      "meanScore": 2155.35,
+      "score": {
+        "mean": 2155.35,
+        "median": 1678,
+        "p10": 473,
+        "p90": 4519,
+        "p99": 7139,
+        "min": 145,
+        "max": 13271
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.353,
+      "maxComboMedian": 3,
+      "maxComboP99": 6,
+      "modeSharePct": {
+        "Open": 26.872,
+        "Normal": 69.804,
+        "Relief": 3.325
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 76.76
+    },
+    {
+      "variant": "reliefFit5",
+      "description": "RAHATLATMA sigma carpani 3 -\u003E 5",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 199.887,
+      "moves": {
+        "mean": 199.887,
+        "median": 146,
+        "p10": 50,
+        "p90": 400,
+        "p99": 809,
+        "min": 20,
+        "max": 968
+      },
+      "meanScore": 2356.007,
+      "score": {
+        "mean": 2356.007,
+        "median": 1675,
+        "p10": 505,
+        "p90": 4886,
+        "p99": 9444,
+        "min": 145,
+        "max": 11531
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.45,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 26.116,
+        "Normal": 70.635,
+        "Relief": 3.249
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 78.512
+    },
+    {
+      "variant": "openL15",
+      "description": "ACIK B carpani 13 -\u003E 15 (GDD \u00A710: S6/S9 yuksekse)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 180.117,
+      "moves": {
+        "mean": 180.117,
+        "median": 128,
+        "p10": 44,
+        "p90": 398,
+        "p99": 674,
+        "min": 14,
+        "max": 845
+      },
+      "meanScore": 2138.167,
+      "score": {
+        "mean": 2138.167,
+        "median": 1532,
+        "p10": 471,
+        "p90": 4727,
+        "p99": 8379,
+        "min": 117,
+        "max": 10401
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.738,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 26.144,
+        "Normal": 70.594,
+        "Relief": 3.262
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 74.718
+    },
+    {
+      "variant": "normalL7",
+      "description": "NORMAL B carpani 10 -\u003E 7 (B agirligi dusuk; GDD \u00A710: S6 dusukse)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 262.633,
+      "moves": {
+        "mean": 262.633,
+        "median": 197,
+        "p10": 49,
+        "p90": 563,
+        "p99": 1031,
+        "min": 14,
+        "max": 1586
+      },
+      "meanScore": 2989.853,
+      "score": {
+        "mean": 2989.853,
+        "median": 2145,
+        "p10": 519,
+        "p90": 6462,
+        "p99": 11933,
+        "min": 109,
+        "max": 18225
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.165,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 24.94,
+        "Normal": 72.303,
+        "Relief": 2.757
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 106.836
+    },
+    {
+      "variant": "allL7",
+      "description": "NORMAL B 10 -\u003E 7, ACIK B 13 -\u003E 10 (B agirligi genel dusuk)",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 244.12,
+      "moves": {
+        "mean": 244.12,
+        "median": 179,
+        "p10": 56,
+        "p90": 494,
+        "p99": 962,
+        "min": 26,
+        "max": 1319
+      },
+      "meanScore": 2745.46,
+      "score": {
+        "mean": 2745.46,
+        "median": 2065,
+        "p10": 566,
+        "p90": 5566,
+        "p99": 11029,
+        "min": 160,
+        "max": 15118
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.043,
+      "maxComboMedian": 3,
+      "maxComboP99": 5,
+      "modeSharePct": {
+        "Open": 25.323,
+        "Normal": 71.708,
+        "Relief": 2.969
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 110.651
+    },
+    {
+      "variant": "combo",
+      "description": "relief28 \u002B NORMAL B 7 \u002B RAHATLATMA sigma 3 -\u003E 4",
+      "bot": "Planner",
+      "games": 300,
+      "meanMoves": 326.65,
+      "moves": {
+        "mean": 326.65,
+        "median": 242,
+        "p10": 68,
+        "p90": 731,
+        "p99": 1202,
+        "min": 14,
+        "max": 1886
+      },
+      "meanScore": 3716.31,
+      "score": {
+        "mean": 3716.31,
+        "median": 2776,
+        "p10": 715,
+        "p90": 8431,
+        "p99": 13678,
+        "min": 109,
+        "max": 21573
+      },
+      "cappedPct": 0,
+      "earlyEndLe9MovesPct": 0,
+      "clearingMovePct": 38.128,
+      "maxComboMedian": 3,
+      "maxComboP99": 6,
+      "modeSharePct": {
+        "Open": 24.42,
+        "Normal": 67.738,
+        "Relief": 7.842
+      },
+      "s1_traysNoFit": 0,
+      "s2_reliefTraysFitLt2": 0,
+      "accountingErrors": 0,
+      "identicalToCoreRun": null,
+      "wallSeconds": 128.21
+    }
+  ]
+}
