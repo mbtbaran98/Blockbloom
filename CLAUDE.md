@@ -4,7 +4,26 @@ Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt aj
 
 ## Vizyon
 
-8×8 ızgaralı, üç parçalı, satır/sütun patlatmalı bir blok bulmaca oyunu. Hedef: türün en "tatmin edici" hissettiren oyunu olmak. Oyunun adı **Blockbloom**; görsel kimlik İznik çinisinden ilham alır (kobalt, turkuaz, mercan kırmızısı, safran, yeşil, mor). Başka bir oyunun adı, logosu, görselleri veya marka unsurları kullanılmaz.
+8×8 ızgaralı, üç parçalı, satır/sütun patlatmalı bir blok bulmaca oyunu. Hedef: türün en "tatmin edici" hissettiren oyunu olmak. Oyunun adı **Blockbloom**. Başka bir oyunun adı, logosu, görselleri veya marka unsurları kullanılmaz.
+
+## Görsel kimlik (kaynak: `Assets/_Project/Art/Branding/logo.png`)
+
+Logo görsel kimliğin referansıdır: koyu mor-lacivert gece zemini, parlak ve hafif hacimli (üstten ışık, alt gölge) "şeker" karolar, "bloom" teması — patlatmada açan çiçekler, yapraklar, küçük parıltılar. Koyu kontur, yuvarlatılmış köşeler, neşeli ama sakin ton.
+
+Palet (logodan ölçülmüş başlangıç değerleri; art-ui netleştirir):
+
+| Rol | Renk |
+|---|---|
+| Zemin | `#18114C` |
+| Karo 1 mavi | `#199FEF` |
+| Karo 2 kırmızı | `#F2433B` |
+| Karo 3 sarı | `#FDDA23` |
+| Karo 4 yeşil | `#76CF36` |
+| Karo 5 pembe | `#EA56A7` |
+| Karo 6 mor | `#AD48E3` |
+| Vurgu turkuaz | `#1BD3F8` |
+
+Çiçek/parıltı efektleri ilke 2'ye bağlıdır: yalnızca oyuncunun patlatmasında ve patlatmanın büyüklüğüyle orantılı çıkar; boşta süs animasyonu yok.
 
 ## Tasarım ilkeleri (araştırmadan türetildi — kaynaklar: `docs/research.md`)
 

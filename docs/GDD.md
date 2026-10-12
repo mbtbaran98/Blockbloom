@@ -448,6 +448,6 @@ oyun başına hamle sayısı, skor, patlatılan çizgi, en yüksek kombo, tam te
 ## 12. Sonraki aşamalar (kapsam dışı, yalnız başlıklar)
 
 - **M1 – His:** kademeli patlatma efektleri (1 çizgi < çok çizgi < kombo), ses katmanları, görüntüyle senkron kısa titreşim, övgü metinleri, kombo göstergesi, oyun sonu animasyonu (İ2, İ3).
-- **M2 – İçerik:** macera modu (çini deseni açan bölümler, haftalık içerik), tarih tohumlu günlük bulmaca, oyuncu geçmişine dayalı gelişmiş zorluk ayarı (İ4, İ5).
+- **M2 – İçerik:** macera modu (açılan resimli bölümler, haftalık içerik), tarih tohumlu günlük bulmaca, oyuncu geçmişine dayalı gelişmiş zorluk ayarı (İ4, İ5).
 - **M3 – Gelir ve analitik:** ödüllü reklamla tek seferlik "devam", reklamsız satın alma, olay takibi (oyun uzunluğu, mod dağılımı, kopma anı) (İ6).
 - **M4 – Yayın:** iOS/Android derleme, mağaza sayfası ve gerçek oynanış videoları, soft launch (İ7, İ8).

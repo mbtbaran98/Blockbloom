@@ -46,3 +46,9 @@ Her karar: tarih, karar, gerekçe, sonuçlar. En yenisi en altta.
 - **Karar:** Oyunun adı **Blockbloom** (çalışma adı "Çini Blok" bırakıldı). Kod ad alanı ve assembly: `Blockbloom.Core`.
 - **Gerekçe:** Proje sahibinin kararı.
 - **Sonuçlar:** İznik çinisinden ilham alan görsel kimlik değişmedi. GDD v0.1 açık soruları belgede yazılı varsayılanlarla onaylandı.
+
+## 2026-10-12 — Görsel kimlik: logo tarzı (İznik bırakıldı)
+
+- **Karar:** Görsel kimliğin referansı Blockbloom logosu (`Assets/_Project/Art/Branding/logo.png`): koyu mor zemin, parlak şeker karolar, patlatmada açan çiçekler. İznik çinisi teması bırakıldı. Palet `CLAUDE.md`'de.
+- **Gerekçe:** Proje sahibinin logo ve tarz tercihi; "bloom" adıyla tutarlı.
+- **Sonuçlar:** Altı karo rengi logodan ölçüldü (GDD renk kimlikleri 1–6 bu sırayla eşlenir). Çiçek efektleri yalnızca patlatmaya bağlı (ilke 2). Logo Unity için PNG'ye çevrildi (Unity WebP içe aktarmaz).
