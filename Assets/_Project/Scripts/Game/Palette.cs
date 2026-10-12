@@ -18,6 +18,8 @@ namespace Blockbloom.Game
         public static readonly Color32 GameOverGray = new Color32(0x86, 0x82, 0xA0, 0xFF);
         /// <summary>Oyun sonu paneli. M0 secimi.</summary>
         public static readonly Color32 Panel = new Color32(0x2C, 0x22, 0x7A, 0xFF);
+        /// <summary>Ikincil dugme zemini (menu "Yeni oyun" kayit varken, HUD menu dugmesi, oyun sonu "Menu"). M0 secimi.</summary>
+        public static readonly Color32 ButtonSecondary = new Color32(0x45, 0x38, 0xA6, 0xFF);
         public static readonly Color32 Text = new Color32(0xFF, 0xFF, 0xFF, 0xFF);
         public static readonly Color32 TextDim = new Color32(0xB9, 0xB2, 0xE8, 0xFF);
 

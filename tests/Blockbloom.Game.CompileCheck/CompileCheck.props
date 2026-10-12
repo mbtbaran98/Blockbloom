@@ -20,6 +20,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Scripts/Core/**/*.cs" Link="Core/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Scripts/Game/**/*.cs" Link="Game/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Scripts/Editor/**/*.cs" Link="Editor/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(MSBuildThisFileDirectory)../../Assets/_Project/Tests/EditMode/**/*.cs" Link="EditModeTests/%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(MSBuildThisFileDirectory)Stubs/*.cs" Link="Stubs/%(Filename)%(Extension)" />
   </ItemGroup>

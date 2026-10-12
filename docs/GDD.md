@@ -270,7 +270,7 @@ Beş hamle puanının toplamı 524'tür; bu toplam iki zincirin aritmetik toplam
 
 ### 7.4 Ana menü (M0)
 Uygulama açılışında ana menü gösterilir (İ1: hızlı başlangıç — menüden oyuna tek dokunuş).
-- **İçerik (yukarıdan aşağı):** logo (`Assets/_Project/Art/Branding/logo.png`, en-boy oranı korunur, ekran genişliğinin en fazla %85'i); "Rekor: N" (`enYüksekSkor`, 0 ise satır gizli); düğmeler.
+- **İçerik (yukarıdan aşağı):** logo (`Assets/_Project/Resources/Branding/logo.png`, en-boy oranı korunur, ekran genişliğinin en fazla %85'i); "Rekor: N" (`enYüksekSkor`, 0 ise satır gizli); düğmeler.
 - **Düğmeler:**
   - **Devam et** — yalnızca kayıtlı yarım oyun varsa görünür ve birincil (vurgulu) düğmedir; kaydı sürdürür (`oyunBaşıRekor` kayıttan).
   - **Yeni oyun** — her zaman görünür; kayıtlı yarım oyun varsa ikincil düğmedir. Kayıtlı oyun varken basılırsa onay sorulmaz, eski kayıt silinir ve yeni oyun başlar (M0 sadeliği; ceza hissi yok çünkü rekor korunur).

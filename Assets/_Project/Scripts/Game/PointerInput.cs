@@ -160,3 +160,25 @@ namespace Blockbloom.Game
 #endif
     }
 }
+
+namespace Blockbloom.Game
+{
+    /// <summary>
+    /// Android geri tusu (GDD §7.4). Input System'de geri tusu Keyboard.escapeKey olarak gelir; eski Input Manager'da
+    /// KeyCode.Escape. Masaustu/editorde Esc ayni isi gorur. Bellek ayirmaz.
+    /// </summary>
+    public static class BackKey
+    {
+        public static bool WasPressedThisFrame()
+        {
+#if ENABLE_INPUT_SYSTEM
+            Keyboard kb = Keyboard.current;
+            return kb != null && kb.escapeKey.wasPressedThisFrame;
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKeyDown(KeyCode.Escape);
+#else
+            return false;
+#endif
+        }
+    }
+}

@@ -85,3 +85,7 @@ Her karar: tarih, karar, gerekçe, sonuçlar. En yenisi en altta.
 - **Karar:** Ana menü M0 kapsamında (GDD §7.4): logo, rekor, "Devam et" (yarım oyun varsa) ve "Yeni oyun"; oyun içinde menü düğmesi oyunu kaydedip menüye döner; oyun sonu panelinde "Menü". Yarıda kalan oyunun sürdürülmesi M0'da zorunlu.
 - **Onaylananlar:** Kombo göstergesi M0'da geçici "Kombo xN" biçiminde; son biçim M1'de art-ui ile. Ertelenen oyun uzatma ayarı (`NormalLargeMul` 10→7) gerçek oyuncu verisinde ortanca oyun uzunluğu < 40 hamle ise yeniden ele alınır.
 - **Gerekçe:** Proje sahibinin kararı.
+
+## 2026-10-12 — Logo Resources'a taşındı
+
+- **Karar:** Logo `Assets/_Project/Resources/Branding/logo.png` konumunda (çalışma anında `Resources.Load` ile menüde gösterilir). Önceki kayıtlardaki `Art/Branding` yolu geçmiştir. İçe aktarma ölçeklemesini kapatan bir editör `AssetPostprocessor`'ı eklendi (`.meta` elle yazılmıyor).

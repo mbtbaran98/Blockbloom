@@ -9,8 +9,11 @@
 | `tests/Blockbloom.Core.Tests/` | NUnit testleri (net8.0, C# 9). Core kaynaklarını doğrudan derler. |
 | `tests/Blockbloom.Core.Compat/` | Uyumluluk denetimi: aynı Core kaynaklarını **netstandard2.1 + C# 9** ile derler (Unity 6'nın API yüzeyi). Çıktısı kullanılmaz; uyarılar hata sayılır. |
 | `Assets/_Project/Scripts/Game/` | Unity katmani (`Blockbloom.Game.asmdef`): `Bootstrap` sahneyi kodla kurar, `GameApp` denetleyici, gorunumler, girdi, kayit. Kural icermez; oyun yalniz `GameState.TryPlace` ile ilerler. |
-| `Assets/_Project/Tests/EditMode/` | Unity Test Framework EditMode testleri (PCG32 referans, PlayerPrefs/JsonUtility kayit gidis-donusu, palet, yerlesim). |
-| `tests/Blockbloom.Game.CompileCheck/` (+ `.Legacy`) | Unity editoru olmadan Game + EditMode kodunun **yalniz derleme** kontrolu (yeni Input System ve eski Input Manager kipleri). Cozum dosyasinda degil; ayri calistirilir. |
+| `Assets/_Project/Scripts/Game/MenuLogic.cs`, `MenuLayout.cs`, `MainMenuView.cs` | GDD §7.4 ana menu. Durum kurallari (`MainMenuModel`, `AppNav`, `TapTracker`, `FadeTimeline`, `TouchTarget`) saf C#; yerlesim (`MenuLayout`) saf hesap; `MainMenuView` yalniz gorunum. |
+| `Assets/_Project/Resources/Branding/logo.png` | Logo. Calisma aninda `Resources.Load<Texture2D>("Branding/logo")` ile yuklenir (Resources altinda olmasi bu yuzden; tasimayin). Sprite kodla olusturulur; doku turu Default ya da Sprite olabilir. Yuklenemezse menude yazili "Blockbloom" basligi. |
+| `Assets/_Project/Scripts/Editor/` | Yalniz editor (`Blockbloom.Editor.asmdef`): `LogoImportSettings` (AssetPostprocessor) logonun iki-kuvveti-olmayan olceklemesini kapatir (1024x572 en-boy korunur). |
+| `Assets/_Project/Tests/EditMode/` | Unity Test Framework EditMode testleri (PCG32 referans, PlayerPrefs/JsonUtility kayit gidis-donusu, palet, yerlesim, ana menu durum mantigi ve yerlesimi, logo yuklemesi). |
+| `tests/Blockbloom.Game.CompileCheck/` (+ `.Legacy`) | Unity editoru olmadan Game + Editor + EditMode kodunun **yalniz derleme** kontrolu (yeni Input System ve eski Input Manager kipleri). Cozum dosyasinda degil; ayri calistirilir. |
 | `tools/Blockbloom.Sim/` | Denge simülasyonu (net8.0 konsol, GDD §10). Core kaynaklarını doğrudan derler; Core'u değiştirmez. Rapor: `docs/reports/m0-balance.md`. |
 | `Blockbloom.Core.sln` | Yukarıdaki projeler. Unity kökte kendi `Blockbloom.sln` dosyasını ürettiği için ad bilerek farklı. |
 
@@ -32,7 +35,7 @@ dotnet build tests/Blockbloom.Game.CompileCheck          # ENABLE_INPUT_SYSTEM
 dotnet build tests/Blockbloom.Game.CompileCheck.Legacy   # ENABLE_LEGACY_INPUT_MANAGER
 ```
 
-- `UnityEngine.dll` NuGet `Unity3D.SDK 2021.1.14.1` paketinden gelir (Unity 2021.1 API'si). uGUI (`Text`), Input System ve `LogAssert` icin `tests/Blockbloom.Game.CompileCheck/Stubs/` altinda elle yazilmis imza taklitleri vardir.
+- `UnityEngine.dll`/`UnityEditor.dll` NuGet `Unity3D.SDK 2021.1.14.1` paketinden gelir (Unity 2021.1 API'si). uGUI (`Text`), Input System (`Touchscreen`, `Mouse`, `Keyboard.escapeKey`) ve `LogAssert` icin `tests/Blockbloom.Game.CompileCheck/Stubs/` altinda elle yazilmis imza taklitleri vardir.
 - Uyarilar hata sayilir. Ad cakismalari (ornegin `Blockbloom.Core.Grid` ile `UnityEngine.Grid`) burada yakalanir; Game kodunda `using Grid = Blockbloom.Core.Grid;` kullanin.
 - Sinirlar: Unity 6'ya ozgu ya da Unity 6'da kaldirilmis API burada yakalanmaz; stub'lar gercek paketle birebir degildir. Son dogrulama Unity editorunde yapilir.
 
@@ -62,9 +65,10 @@ dotnet run -c Release --project tools/Blockbloom.Sim -- --help   # tüm seçenek
    - Ilk acilista Unity `Library/`, eksik `ProjectSettings/*.asset` dosyalarini ve `Packages/packages-lock.json`'u uretir; paketler (`com.unity.inputsystem`, `com.unity.ugui`, `com.unity.test-framework`) indirilir.
    - **Input System sorusu:** "This project is using the new input system package but the native platform backends for the new input system are not enabled... Do you want to enable the backends?" → **Yes** (editor yeniden baslar). "No" derseniz oyun eski Input Manager ile de calisir (kod iki kipte de derlenir). Player Settings → Active Input Handling: `Input System Package (New)` ya da `Both` onerilir.
    - Render: yerlesik (Built-in) renderer. URP M0'da kullanilmiyor; URP kurulumu M1'de art-ui ile yapilacak.
-3. Herhangi bir sahneyi acin (bos sahne de olur: File → New Scene) ve **Play**'e basin. `Bootstrap` (`[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]`) kamerayi, tahtayi, tepsiyi, HUD'u ve oyun sonu panelini kodla kurar; sahnede `Main Camera` varsa onu kullanir.
+3. Herhangi bir sahneyi acin (bos sahne de olur: File → New Scene) ve **Play**'e basin. `Bootstrap` (`[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]`) kamerayi, ana menuyu, tahtayi, tepsiyi, HUD'u ve oyun sonu panelini kodla kurar; sahnede `Main Camera` varsa onu kullanir.
+   - Acilista **ana menu** (GDD §7.4) gorunur: logo, "Rekor: N" (0 ise gizli), kayitli yarim oyun varsa "Devam et" (birincil) ve her zaman "Yeni oyun". Oyunda sol ustteki menu dugmesi ya da Esc (Android geri tusu) oyunu kaydedip menuye doner; menude Esc/geri uygulamadan cikar (editorde etkisiz).
    - Fare ile surukle-birak calisir. Telefon deneyimi icin Game gorunumunu **Simulator**'a alin ya da cihaza derleyin.
-   - Yarim kalan oyun Play durdurulunca (`OnApplicationQuit`) / uygulama arka plana alininca (`OnApplicationPause`) PlayerPrefs'e kaydedilir ve sonraki Play'de devam eder. Sifirlamak icin: Edit → Clear All PlayerPrefs.
+   - Yarim kalan oyun menuye donunce, Play durdurulunca (`OnApplicationQuit`) / uygulama arka plana alininca (`OnApplicationPause`) PlayerPrefs'e kaydedilir; sonraki acilista dogrudan surdurulmez, menude "Devam et" ile surdurulur. Sifirlamak icin: Edit → Clear All PlayerPrefs.
 4. Testler: Window → General → **Test Runner** → EditMode → Run All.
 5. **`.meta` dosyalari:** Unity her varlik icin `.meta` (GUID) uretir. Bunlari elle yazmayin; Unity'nin urettiklerini **commit edin** (asmdef referanslari ve ileride sahne/prefab baglantilari bu GUID'lere dayanir). `Library/`, `Temp/`, `Logs/`, `UserSettings/` ve Unity'nin urettigi kok `*.csproj`/`*.sln` commit edilmez (`.gitignore`).
 
@@ -88,7 +92,18 @@ MoveResult r = game.TryPlace(slot, ax, ay);                          // bırakı
 ## Unity'de yerelde doğrulanması gerekenler
 
 - Projenin Unity 6000.0'da hatasız derlenmesi, paket sürümlerinin çözülmesi, asmdef'lerin tanınması (bulut ortamında Unity yok; yalnız `tests/Blockbloom.Game.CompileCheck*` derleme kontrolü yapıldı).
-- EditMode testleri: `SnapshotStoreTests` (gerçek `JsonUtility` + PlayerPrefs), `Pcg32ReferenceTests`, `PaletteAndLayoutTests`.
+- EditMode testleri: `SnapshotStoreTests` (gerçek `JsonUtility` + PlayerPrefs), `Pcg32ReferenceTests`, `PaletteAndLayoutTests`, `MainMenuLogicTests`, `MenuLayoutTests` (`Logo_LoadsFromResources_AsTexture2D` yalniz Unity'de calisir: logonun Resources'tan yuklendigini ve en-boy oraninin ~1,79 kaldigini, yani NPOT olceklemesinin kapali oldugunu denetler).
 - IL2CPP (iOS/Android) derlemesinde PCG32 referans değerleri (aynı test cihazda/PlayMode'da).
 - Oynanış: GDD §8 tablosu (dokunma alanı, 80 ms kaldırma, 1,2 hücre ofset, 0,75 hücre çapa eşiği, %45 önizleme, çizgi vurgusu, 150 ms dönüş, %40 soluk parça, tek parmak), GDD §7.1 oyun sonu akışı, portre/yatay ve çentikli ekranda yerleşim.
-- Arka plana alma (`OnApplicationPause`) → rekor yazımı ve kaldığı yerden devam.
+- Arka plana alma (`OnApplicationPause`) → rekor yazımı; sonraki açılışta menüde "Devam et" ile kaldığı yerden devam.
+- Ana menü (GDD §7.4):
+  - İlk açılış (Edit → Clear All PlayerPrefs sonrası): logo görünür, en-boy oranı bozulmamış, ekran genişliğinin en fazla %85'i; "Rekor" satırı yok; yalnız "Yeni oyun" (turkuaz, birincil). Logo dikdörtgeninin zeminle uyumu (logo PNG'si saydam değil) göz kontrolü.
+  - Logoyu geçici olarak Resources dışına taşıyınca menüde yazılı "Blockbloom" başlığı ve bir uyarı logu çıkar (sonra geri taşıyın).
+  - Birkaç hamle → sol üstteki menü düğmesi → menüde "Devam et" birincil, "Yeni oyun" ikincil, rekor > 0 ise "Rekor: N". "Devam et" → tahta, tepsi, skor, kombo aynen geri gelir; sürdürülen oyun rekor kırarak bitince "Yeni rekor!" kuralı (oyunBaşıRekor kayıttan, GDD §7.2) korunur.
+  - Kayıt varken "Yeni oyun" → onay sorulmadan yeni oyun; menüye dönünce "Devam et" yalnız yeni oyunun kaydıyla görünür (eski kayıt silinmiş).
+  - Oyun sonu paneli → "Menü": menüde yalnız "Yeni oyun", rekor güncel. "Tekrar oyna" eskisi gibi doğrudan yeni oyun.
+  - Menü düğmesi dokunma alanı ≥ 44 pt (telefonda parmakla rahat basılıyor mu; `Screen.dpi` 0 dönen cihazda da). Düğmeye basıp parmağı dışarı kaydırıp bırakmak menüye götürmez; düğmeden başlayan temas parça sürüklemez.
+  - Menü açıkken tepsi alanına dokunmak/sürüklemek hiçbir şey yapmaz; geçiş sırasında dokunuşlar yok sayılır.
+  - Geçişler ≤ 200 ms (zemin rengine solup açılma); metinler ve sprite'lar birlikte solar, titreme/bir kare eski ekran görünmez. Profiler'da geçiş ve menü karelerinde GC Alloc 0 (menüye giriş anındaki tek seferlik metin dışında).
+  - Android cihazda geri tuşu: oyunda → menü (oyun kaydedilir), oyun sonu panelinde → menü, oyun sonu beklemesinde (600 ms + solma) yok sayılır, menüde → uygulama kapanır. Input System ve eski Input Manager kiplerinde ayrı ayrı.
+  - Portre ve yatayda (ve döndürmede) menü yerleşimi: portrede logo üstte, düğmeler altta; yatayda logo solda, rekor+düğmeler sağda; çentikli ekranda güvenli alan dışına taşma yok.

@@ -5,7 +5,9 @@ using UnityEngine;
 namespace Blockbloom.Game
 {
     /// <summary>
-    /// M0 oyun denetleyicisi: sahneyi kodla kurar, girdiyi okur, Core'u (GameState) surer, gorunumleri gunceller.
+    /// M0 uygulama denetleyicisi: sahneyi kodla kurar, ana menuyu (GDD §7.4) ve oyunu yonetir, girdiyi okur,
+    /// Core'u (GameState) surer, gorunumleri gunceller. Acilista ana menu gosterilir; kayitli yarim oyun yalniz
+    /// "Devam et" ile surdurulur. Ekranlar arasi gecis &lt;= 200 ms soluma (FadeTimeline).
     /// Oyun mantigi yalnizca GameState.TryPlace uzerinden ilerler; bu sinif kural icermez.
     /// Performans (I8): tum nesneler Awake'te kurulur; Update'te Instantiate/Find yok, kare basina bellek ayirma yok
     /// (metinler yalniz deger degisince, MoveResult yalniz hamlede olusur).
@@ -24,14 +26,30 @@ namespace Blockbloom.Game
         private readonly PieceView[] _pieces = new PieceView[Tray.SlotCount];
         private HudView _hud;
         private GameOverView _gameOver;
+        private MainMenuView _menu;
+        private Transform _gameRoot;
+        private Canvas _gameCanvas, _menuCanvas;
+        private CanvasGroup _gameGroup, _menuGroup;
+        private SpriteRenderer _cover;
         private readonly PointerInput _input = new PointerInput();
+        private readonly TapTracker _taps = new TapTracker();
+
+        // Ekran ve gecis (GDD §7.4)
+        private AppScreen _screen = AppScreen.Menu;
+        private FadeTimeline _fade;
+        private bool _fadeSwitched;
+        private AppScreen _fadeTarget;
+        private MenuButton _fadeAction;
+        private float _coverShown = -1f;
 
         // Yerlesim
         private Layout _layout;
         private int _screenW = -1, _screenH = -1;
         private Rect _safe;
         private Rect _view;
+        private Rect _safeWorld;
         private float _ppu;
+        private float _minTouch;
 
         // Oyun
         private GameState _game;
@@ -40,7 +58,6 @@ namespace Blockbloom.Game
         private int _bestAtStart;
         private Phase _phase;
         private float _gameOverAt;
-        private bool _buttonArmed;
         private ulong _seedSalt;
         private readonly byte[] _colorsBefore = new byte[CoreConfig.CellCount];
 
@@ -75,8 +92,11 @@ namespace Blockbloom.Game
             _records = new PlayerPrefsRecordStore();
             _saves = new SnapshotStore();
             BuildScene();
-            StartOrResume();
             UpdateLayoutIfNeeded(); // ilk kare cizilmeden yerlesim hazir
+            ShowMenu();             // GDD §7.4: acilista ana menu; kayit varsa "Devam et"
+            _fade = FadeTimeline.RevealOnly(Time.unscaledTime);
+            _fadeSwitched = true;
+            ApplyCover(1f);
         }
 
         private void OnDestroy()
@@ -111,41 +131,74 @@ namespace Blockbloom.Game
             _world.rotation = Quaternion.identity;
             Vector3 ls = transform.lossyScale;
             _world.localScale = new Vector3(1f / Mathf.Max(1e-4f, ls.x), 1f / Mathf.Max(1e-4f, ls.y), 1f);
-            _board = new BoardView(_world);
+            _gameRoot = new GameObject("Game").transform;
+            _gameRoot.SetParent(_world, false);
+            _board = new BoardView(_gameRoot);
             var trayRoot = new GameObject("Tray").transform;
-            trayRoot.SetParent(_world, false);
+            trayRoot.SetParent(_gameRoot, false);
             for (int i = 0; i < _pieces.Length; i++) _pieces[i] = new PieceView(trayRoot, i);
 
-            var canvasGo = new GameObject("Canvas", typeof(RectTransform));
-            canvasGo.transform.SetParent(transform, false);
-            var canvas = canvasGo.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 10;
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            _hud = new HudView(canvasGo.transform, font);
-            _gameOver = new GameOverView(_world, canvasGo.transform, font);
+            _gameCanvas = NewCanvas("GameCanvas", out _gameGroup);
+            _menuCanvas = NewCanvas("MenuCanvas", out _menuGroup);
+            _hud = new HudView(_gameRoot, _gameCanvas.transform, font);
+            _gameOver = new GameOverView(_gameRoot, _gameCanvas.transform, font);
+            _menu = new MainMenuView(_world, _menuCanvas.transform, font);
+
+            // Gecis ortusu: zemin renginde tam ekran sprite (dunya) + kanvas alfasi (metinler ortunun ustunde cizildigi icin).
+            var coverGo = new GameObject("FadeCover");
+            coverGo.transform.SetParent(_world, false);
+            _cover = coverGo.AddComponent<SpriteRenderer>();
+            _cover.sprite = SpriteFactory.White;
+            _cover.sortingOrder = 1000;
+            _cover.color = Palette.Background;
+            _cover.enabled = false;
         }
 
-        private void StartOrResume()
+        private Canvas NewCanvas(string name, out CanvasGroup group)
         {
-            if (_saves.TryLoad(out GameSnapshot snap, out int bestAtStart))
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(transform, false);
+            var canvas = go.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 10;
+            group = go.AddComponent<CanvasGroup>();
+            group.interactable = false;
+            group.blocksRaycasts = false;
+            return canvas;
+        }
+
+        /// <summary>
+        /// Surdurulebilir kayit var mi; varsa geri yukler. Okunamayan, tutarsiz ya da bitmis kayit silinir
+        /// (menude hic calismayan bir "Devam et" gosterilmesin diye menuye girerken de cagrilir).
+        /// </summary>
+        private bool TryLoadResumable(out GameState game, out int bestAtStart)
+        {
+            game = null;
+            if (!_saves.TryLoad(out GameSnapshot snap, out bestAtStart)) return false;
+            try
             {
-                try
+                GameState restored = GameState.FromSnapshot(snap);
+                if (!restored.IsGameOver)
                 {
-                    GameState restored = GameState.FromSnapshot(snap);
-                    if (!restored.IsGameOver)
-                    {
-                        BeginGame(restored, bestAtStart);
-                        return;
-                    }
+                    game = restored;
+                    return true;
                 }
-                catch (ArgumentException e)
-                {
-                    Debug.LogWarning("Blockbloom: kayitli oyun gecersiz, yeni oyun baslatiliyor. " + e.Message);
-                }
-                _saves.Clear();
             }
-            StartNewGame();
+            catch (ArgumentException e)
+            {
+                Debug.LogWarning("Blockbloom: kayitli oyun gecersiz, siliniyor. " + e.Message);
+            }
+            _saves.Clear();
+            bestAtStart = 0;
+            return false;
+        }
+
+        /// <summary>GDD §7.4 "Devam et": kaydi surdurur (oyunBasiRekor kayittan). Kayit kaybolduysa yeni oyun.</summary>
+        private void ResumeSavedGame()
+        {
+            if (TryLoadResumable(out GameState game, out int bestAtStart)) BeginGame(game, bestAtStart);
+            else StartNewGame();
         }
 
         private void StartNewGame()
@@ -164,7 +217,7 @@ namespace Blockbloom.Game
             _phase = Phase.Playing;
             _dragSlot = -1;
             _hasAnchor = false;
-            _buttonArmed = false;
+            _taps.Reset();
             for (int i = 0; i < _returning.Length; i++) _returning[i] = false;
             _gameOver.Hide();
             _board.ClearAllFx();
@@ -178,41 +231,191 @@ namespace Blockbloom.Game
 
         private void Update()
         {
-            if (_game == null) return;
+            if (_menu == null) return; // kurulmamis (yinelenen ornek yok ediliyor)
             float now = Time.unscaledTime;
             UpdateLayoutIfNeeded();
+            TickTransition(now);
 
+            // Girdi her karede okunur (izlenen temas tutarli kalsin); gecis surerken yok sayilir.
             PointerSample p = _input.Read();
-            switch (_phase)
+            bool back = BackKey.WasPressedThisFrame();
+            bool transitioning = _fade.Active;
+
+            if (_screen == AppScreen.Menu)
             {
-                case Phase.Playing:
-                    HandlePlayingInput(p, now);
-                    break;
-                case Phase.GameOverWait:
-                    TickGameOver(now);
-                    break;
-                case Phase.GameOverPanel:
-                    HandlePanelInput(p);
-                    break;
+                if (!transitioning) HandleMenuInput(p, now);
+            }
+            else if (_game != null)
+            {
+                switch (_phase)
+                {
+                    case Phase.Playing:
+                        if (AppNav.DragAllowed(_screen, transitioning)) HandlePlayingInput(p, now);
+                        break;
+                    case Phase.GameOverWait:
+                        TickGameOver(now);
+                        break;
+                    case Phase.GameOverPanel:
+                        if (!transitioning) HandlePanelInput(p, now);
+                        break;
+                }
             }
 
-            TickLift(now);
-            TickReturns(now);
-            _board.TickFx(now);
+            if (back) HandleBack(now);
+
+            if (_game != null && _screen == AppScreen.Game)
+            {
+                TickLift(now);
+                TickReturns(now);
+                _board.TickFx(now);
+            }
         }
+
+        // ------------------------------------------------------------------ menu ve gecisler (GDD §7.4)
+
+        private void HandleMenuInput(PointerSample p, float now)
+        {
+            if (p.Down) _taps.Down(_menu.HitTest(ScreenToWorld(p.Position)));
+            if (!p.Up) return;
+            int fired = _taps.Up(_menu.HitTest(ScreenToWorld(p.Position)));
+            if (fired == MainMenuView.ButtonContinue) BeginTransition(AppScreen.Game, MenuButton.Continue, now);
+            else if (fired == MainMenuView.ButtonNewGame)
+            {
+                // Onay yok: eski kayit silinir, rekor korunur.
+                _saves.Clear();
+                BeginTransition(AppScreen.Game, MenuButton.NewGame, now);
+            }
+        }
+
+        private void HandleBack(float now)
+        {
+            bool locked = _screen == AppScreen.Game && _phase == Phase.GameOverWait;
+            switch (AppNav.OnBack(_screen, _fade.Active, locked))
+            {
+                case BackAction.GoToMenu:
+                    GoToMenu(now);
+                    break;
+                case BackAction.Quit:
+                    QuitApp();
+                    break;
+            }
+        }
+
+        /// <summary>Oyun icinden menuye: surukleme iptal, oyun kaydedilir (bitmisse kayit zaten silinmis), soluma.</summary>
+        private void GoToMenu(float now)
+        {
+            CancelDrag();
+            PersistProgress();
+            BeginTransition(AppScreen.Menu, MenuButton.None, now);
+        }
+
+        private static void QuitApp()
+        {
+            // iOS'ta uygulamalar kendini kapatmaz (geri tusu da yok); diger platformlarda cik. Editorde etkisiz.
+            if (Application.platform == RuntimePlatform.IPhonePlayer) return;
+            Application.Quit();
+        }
+
+        private void BeginTransition(AppScreen target, MenuButton action, float now)
+        {
+            _taps.Reset();
+            _fade = FadeTimeline.Transition(now);
+            _fadeSwitched = false;
+            _fadeTarget = target;
+            _fadeAction = action;
+        }
+
+        /// <summary>Ortu hesabi; solmanin sonunda ekran degisir. Kare basina bellek ayirmaz.</summary>
+        private void TickTransition(float now)
+        {
+            if (!_fade.Active) return;
+            if (!_fadeSwitched && _fade.PastMidpoint(now))
+            {
+                _fadeSwitched = true;
+                if (_fadeTarget == AppScreen.Menu)
+                {
+                    ShowMenu();
+                }
+                else
+                {
+                    if (_fadeAction == MenuButton.Continue) ResumeSavedGame();
+                    else StartNewGame();
+                    ShowGameScreen();
+                }
+            }
+            float c = _fade.Cover(now);
+            if (_fade.Finished(now))
+            {
+                _fade.Stop();
+                c = 0f;
+            }
+            ApplyCover(c);
+        }
+
+        private void ApplyCover(float c)
+        {
+            if (c == _coverShown) return;
+            _coverShown = c;
+            bool on = c > 0f;
+            if (_cover.enabled != on) _cover.enabled = on;
+            Color col = Palette.Background;
+            col.a = c;
+            _cover.color = col;
+            _gameGroup.alpha = 1f - c;
+            _menuGroup.alpha = 1f - c;
+        }
+
+        private void ShowMenu()
+        {
+            _screen = AppScreen.Menu;
+            _taps.Reset();
+            _gameOver.Hide();
+            _gameRoot.gameObject.SetActive(false);
+            _gameCanvas.enabled = false;
+
+            bool hasSave = TryLoadResumable(out _, out _);
+            _menu.SetModel(MainMenuModel.Create(hasSave, _records.BestScore));
+            _menu.Layout(_safeWorld, _view.width, _minTouch);
+            _menu.Apply(_cam, _ppu);
+            _menu.SetVisible(true);
+            _menuCanvas.enabled = true;
+        }
+
+        private void ShowGameScreen()
+        {
+            _screen = AppScreen.Game;
+            _taps.Reset();
+            _menu.SetVisible(false);
+            _menuCanvas.enabled = false;
+            _gameRoot.gameObject.SetActive(true);
+            _gameCanvas.enabled = true;
+        }
+
+        // ------------------------------------------------------------------ oyun girdisi
 
         private void HandlePlayingInput(PointerSample p, float now)
         {
-            if (_dragSlot < 0 && p.Down)
+            if (_dragSlot < 0)
             {
-                Vector2 w = ScreenToWorld(p.Position);
-                for (int i = 0; i < Tray.SlotCount; i++)
+                // HUD menu dugmesi (isabet testi; temas dugmede basladiysa surukleme baslamaz).
+                if (p.Down)
                 {
-                    if (_game.Tray[i].HasValue && _layout.SlotTouchRect(i, _view).Contains(w))
+                    Vector2 w = ScreenToWorld(p.Position);
+                    if (_taps.Down(_hud.MenuButtonRect.Contains(w) ? 0 : TapTracker.NoButton)) return;
+                    for (int i = 0; i < Tray.SlotCount; i++)
                     {
-                        BeginDrag(i, now);
-                        break;
+                        if (_game.Tray[i].HasValue && _layout.SlotTouchRect(i, _view).Contains(w))
+                        {
+                            BeginDrag(i, now);
+                            break;
+                        }
                     }
+                }
+                else if (_taps.Armed != TapTracker.NoButton)
+                {
+                    if (p.Up && _taps.Up(_hud.MenuButtonRect.Contains(ScreenToWorld(p.Position)) ? 0 : TapTracker.NoButton) == 0)
+                        GoToMenu(now);
+                    return;
                 }
             }
             if (_dragSlot < 0) return;
@@ -347,19 +550,16 @@ namespace Blockbloom.Game
             _gameOver.Show(score, Math.Max(_bestAtStart, score), score > _bestAtStart,
                 _game.Stats.Moves, _game.Stats.LinesCleared, _game.Stats.MaxCombo);
             _phase = Phase.GameOverPanel;
-            _buttonArmed = false;
+            _taps.Reset();
         }
 
-        private void HandlePanelInput(PointerSample p)
+        private void HandlePanelInput(PointerSample p, float now)
         {
-            Rect r = _gameOver.ButtonRect;
-            if (p.Down) _buttonArmed = r.Contains(ScreenToWorld(p.Position));
-            if (p.Up)
-            {
-                bool hit = _buttonArmed && r.Contains(ScreenToWorld(p.Position));
-                _buttonArmed = false;
-                if (hit) StartNewGame();
-            }
+            if (p.Down) _taps.Down(_gameOver.HitTest(ScreenToWorld(p.Position)));
+            if (!p.Up) return;
+            int fired = _taps.Up(_gameOver.HitTest(ScreenToWorld(p.Position)));
+            if (fired == GameOverView.ButtonReplay) StartNewGame();
+            else if (fired == GameOverView.ButtonMenu) GoToMenu(now); // kayit oyun sonunda silindi; menude yalniz "Yeni oyun"
         }
 
         // ------------------------------------------------------------------ cizim yardimcilari
@@ -430,34 +630,42 @@ namespace Blockbloom.Game
             _ppu = h / (2f * size);
             float viewH = size * 2f, viewW = viewH * ((float)w / Mathf.Max(1, h));
             _view = new Rect(camPos.x - viewW * 0.5f, camPos.y - viewH * 0.5f, viewW, viewH);
+            _safeWorld = MenuLayout.ScreenToWorldRect(safe, w, h, camPos, _ppu);
+            _minTouch = TouchTarget.MinPixels(Screen.dpi, Mathf.Min(w, h)) / Mathf.Max(1e-4f, _ppu);
+            _cover.transform.localPosition = new Vector3(_view.center.x, _view.center.y, 0f);
+            _cover.transform.localScale = new Vector3(_view.width + 2f, _view.height + 2f, 1f);
 
             for (int i = 0; i < Tray.SlotCount; i++)
             {
                 if (i == _dragSlot || _returning[i] || !_pieces[i].Visible) continue;
                 _pieces[i].SetPose(_pieces[i].RestPivot(_layout.SlotCenter(i)), InteractionConfig.TrayScale);
             }
-            _hud.Layout(_layout.Hud);
+            _hud.Layout(_layout.Hud, _minTouch);
             _hud.Apply(_cam, _ppu);
-            _gameOver.Layout(_view);
+            _gameOver.Layout(_view, _minTouch);
             _gameOver.Apply(_cam, _ppu);
+            _menu.Layout(_safeWorld, _view.width, _minTouch);
+            _menu.Apply(_cam, _ppu);
         }
 
         // ------------------------------------------------------------------ kalicilik (GDD §7.3)
 
         private void OnApplicationPause(bool paused)
         {
-            if (!paused) return;
+            if (!paused || _screen != AppScreen.Game) return;
             CancelDrag();
             PersistProgress();
         }
 
         private void OnApplicationQuit()
         {
+            if (_screen != AppScreen.Game) return; // menude kayit zaten guncel
             PersistProgress();
         }
 
         private void CancelDrag()
         {
+            _taps.Reset();
             if (_dragSlot < 0) return;
             int slot = _dragSlot;
             _dragSlot = -1;

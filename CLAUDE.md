@@ -6,7 +6,7 @@ Bu dosya projenin ortak hafızasıdır. Ana oturum (koordinatör) ve tüm alt aj
 
 8×8 ızgaralı, üç parçalı, satır/sütun patlatmalı bir blok bulmaca oyunu. Hedef: türün en "tatmin edici" hissettiren oyunu olmak. Oyunun adı **Blockbloom**. Başka bir oyunun adı, logosu, görselleri veya marka unsurları kullanılmaz.
 
-## Görsel kimlik (kaynak: `Assets/_Project/Art/Branding/logo.png`)
+## Görsel kimlik (kaynak: `Assets/_Project/Resources/Branding/logo.png`)
 
 Logo görsel kimliğin referansıdır: koyu mor-lacivert gece zemini, parlak ve hafif hacimli (üstten ışık, alt gölge) "şeker" karolar, "bloom" teması — patlatmada açan çiçekler, yapraklar, küçük parıltılar. Koyu kontur, yuvarlatılmış köşeler, neşeli ama sakin ton.
 
@@ -54,6 +54,8 @@ Assets/_Project/Scripts/Fx/      # efekt, ses, titreşim (juice) katmanı
 Assets/_Project/Scripts/UI/      # HUD, menüler
 Assets/_Project/Scenes/          # Boot, Menu, Game
 Assets/_Project/Art/, Audio/     # görsel ve ses
+Assets/_Project/Resources/       # çalışma anında yüklenen varlıklar (ör. Branding/logo.png)
+Assets/_Project/Scripts/Editor/  # yalnız editör araçları (içe aktarma ayarları vb.)
 Assets/_Project/Tests/           # Unity Test Framework (EditMode/PlayMode)
 tests/Blockbloom.Core.Tests/       # Core terminal testleri (dotnet test, NUnit)
 tools/                           # denge simülasyonu vb. (dotnet konsol)

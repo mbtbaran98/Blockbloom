@@ -2,7 +2,8 @@
 // com.unity.inputsystem 1.11 API'sinin oyun kodunda kullanilan alt kumesini ayni tip/uye adlariyla taklit eder:
 // Touchscreen.current, Touchscreen.touches (ReadOnlyArray<TouchControl>), TouchControl.touchId (IntegerControl),
 // TouchControl.press (TouchPressControl : ButtonControl), TouchControl.position (Vector2Control),
-// Mouse.current, Mouse.leftButton (ButtonControl), Pointer.position, InputControl<T>.ReadValue().
+// Mouse.current, Mouse.leftButton (ButtonControl), Pointer.position, InputControl<T>.ReadValue(),
+// Keyboard.current, Keyboard.escapeKey (KeyControl : ButtonControl; Android geri tusu).
 namespace UnityEngine.InputSystem.Utilities
 {
     public struct ReadOnlyArray<TValue>
@@ -35,6 +36,12 @@ namespace UnityEngine.InputSystem
         public new static Mouse current { get; private set; }
     }
 
+    public class Keyboard : InputDevice
+    {
+        public Controls.KeyControl escapeKey { get; protected set; }
+        public static Keyboard current { get; private set; }
+    }
+
     public class Touchscreen : Pointer
     {
         public Controls.TouchControl primaryTouch { get; protected set; }
@@ -55,6 +62,8 @@ namespace UnityEngine.InputSystem.Controls
     }
 
     public class TouchPressControl : ButtonControl { }
+
+    public class KeyControl : ButtonControl { }
 
     public class IntegerControl : InputControl<int> { }
 
