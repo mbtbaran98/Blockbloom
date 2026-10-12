@@ -79,3 +79,9 @@ Her karar: tarih, karar, gerekçe, sonuçlar. En yenisi en altta.
 - **Kayıt:** Yarım oyun `SavedGameDto` v1 (PlayerPrefs `bb.savedGame.v1`, `bestAtStart` dahil), rekorlar `bb.records.*`.
 - **Doğrulama:** Unity editörü olmadığından Game kodu `Unity3D.SDK` (NuGet) + imza taklitleriyle iki girdi kipinde derleme kontrolünden geçirilir (`tests/Blockbloom.Game.CompileCheck*`, çözüm dışında). Unity 6'ya özgü API farklarını yakalamaz; yerel Unity doğrulaması şart.
 - **Gerekçe:** Bulut ortamında Unity editörü yok; sahne/prefab YAML'ı elle yazmak kırılgan. Ek paket ve içe aktarma adımı gerektirmeyen en kısa yol.
+
+## 2026-10-12 — Ana menü M0'a alındı; açık sorular kapandı
+
+- **Karar:** Ana menü M0 kapsamında (GDD §7.4): logo, rekor, "Devam et" (yarım oyun varsa) ve "Yeni oyun"; oyun içinde menü düğmesi oyunu kaydedip menüye döner; oyun sonu panelinde "Menü". Yarıda kalan oyunun sürdürülmesi M0'da zorunlu.
+- **Onaylananlar:** Kombo göstergesi M0'da geçici "Kombo xN" biçiminde; son biçim M1'de art-ui ile. Ertelenen oyun uzatma ayarı (`NormalLargeMul` 10→7) gerçek oyuncu verisinde ortanca oyun uzunluğu < 40 hamle ise yeniden ele alınır.
+- **Gerekçe:** Proje sahibinin kararı.

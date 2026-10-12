@@ -1,6 +1,6 @@
 # Blockbloom — Oyun Tasarım Belgesi (GDD)
 
-- **Sürüm:** v0.2 — 2026-10-12
+- **Sürüm:** v0.3 — 2026-10-12
 - **Kapsam:** M0 (çekirdek oyun, klasik mod). M1–M4 yalnızca §12'de listelenir.
 - **Sahibi:** game-designer. Değişiklikler `docs/decisions.md` ile eşlenir.
 - **İlke atıfları:** "İ1…İ8" = `CLAUDE.md` → *Tasarım ilkeleri* maddeleri.
@@ -12,6 +12,7 @@
 |---|---|---|
 | v0.2 | 2026-10-12 | M0 denge raporu (`docs/reports/m0-balance.md`) sonrası: §6.4 örnekleri gerçekçi tahta durumlarıyla yeniden yazıldı (puanlar aynı: 4/13/84/422/1). §7.2 "Yeni rekor!" oyun başında okunan rekora göre. §9: `GameSnapshot.ClearedInCurrentTray`, `TraysDealt` sayım kuralı, `WeightProfile` geçerlilik şartları, `FromSnapshot` doğrulamaları. §10: S5 → 12–30, S6 → 45–120, yeni S16 (planlayıcı bot 150–400); ayar yönergeleri ölçüme göre düzeltildi; "Ertelenen ayar" notu. Denge değerleri değişmedi. |
 | v0.1 | 2026-10-12 | İlk sürüm. |
+| v0.3 | 2026-10-12 | §7.4 ana menü M0 kapsamına alındı; yarıda kalan oyunun sürdürülmesi M0'da zorunlu; kombo HUD biçimi geçici kabul edildi. |
 
 ---
 
@@ -265,7 +266,19 @@ Beş hamle puanının toplamı 524'tür; bu toplam iki zincirin aritmetik toplam
 - Saklanan: `enYüksekSkor` (int), `oynananOyun` (int), `enYüksekKombo` (int).
 - Yazma anları: oyun sonu; ayrıca uygulama arka plana atılırken anlık skor rekoru aşmışsa rekor hemen yazılır (rekor kaybolmaz).
 - HUD: üstte anlık skor ve rekor; rekor alanı `max(oyunBaşıRekor, anlıkSkor)` gösterir (§7.2).
-- Depolama yöntemi Unity katmanının işidir (`IRecordStore` arayüzü, §9). Yarıda kalan oyunun kaydı (anlık görüntü) API'de hazırdır; M0'da UI'a bağlanması **isteğe bağlıdır** (açık soru).
+- Depolama yöntemi Unity katmanının işidir (`IRecordStore` arayüzü, §9). Yarıda kalan oyunun kaydı (anlık görüntü) M0'da **zorunludur** ve §7.4 menüsündeki "Devam et" ile sürdürülür.
+
+### 7.4 Ana menü (M0)
+Uygulama açılışında ana menü gösterilir (İ1: hızlı başlangıç — menüden oyuna tek dokunuş).
+- **İçerik (yukarıdan aşağı):** logo (`Assets/_Project/Art/Branding/logo.png`, en-boy oranı korunur, ekran genişliğinin en fazla %85'i); "Rekor: N" (`enYüksekSkor`, 0 ise satır gizli); düğmeler.
+- **Düğmeler:**
+  - **Devam et** — yalnızca kayıtlı yarım oyun varsa görünür ve birincil (vurgulu) düğmedir; kaydı sürdürür (`oyunBaşıRekor` kayıttan).
+  - **Yeni oyun** — her zaman görünür; kayıtlı yarım oyun varsa ikincil düğmedir. Kayıtlı oyun varken basılırsa onay sorulmaz, eski kayıt silinir ve yeni oyun başlar (M0 sadeliği; ceza hissi yok çünkü rekor korunur).
+- **Oyun içinden menüye:** HUD sol üstte **menü düğmesi** (≥ 44 pt dokunma alanı). Basınca oyun anlık görüntüsü kaydedilir ve ana menüye dönülür; onay yok, oyun kaybolmaz.
+- **Oyun sonu paneli → Menü:** kayıt silinmiş olduğundan menüde yalnız "Yeni oyun" görünür; rekor güncellenmiş gösterilir.
+- **Geri tuşu (Android):** oyunda → menü düğmesiyle aynı; menüde → uygulamadan çık.
+- Geçişler ≤ 200 ms soluma; M0'da ses/efekt yok.
+- Menüde reklam yok (İ6); ayarlar (ses, titreşim, hareketi azalt) M1'de menüye eklenir.
 
 ---
 
