@@ -52,3 +52,22 @@ Her karar: tarih, karar, gerekçe, sonuçlar. En yenisi en altta.
 - **Karar:** Görsel kimliğin referansı Blockbloom logosu (`Assets/_Project/Art/Branding/logo.png`): koyu mor zemin, parlak şeker karolar, patlatmada açan çiçekler. İznik çinisi teması bırakıldı. Palet `CLAUDE.md`'de.
 - **Gerekçe:** Proje sahibinin logo ve tarz tercihi; "bloom" adıyla tutarlı.
 - **Sonuçlar:** Altı karo rengi logodan ölçüldü (GDD renk kimlikleri 1–6 bu sırayla eşlenir). Çiçek efektleri yalnızca patlatmaya bağlı (ilke 2). Logo Unity için PNG'ye çevrildi (Unity WebP içe aktarmaz).
+
+## 2026-10-12 — M0 denge hedefleri ölçüme göre güncellendi; uzatma ayarı ertelendi
+
+- **Karar:** GDD v0.2 §10: S5 (rastgele bot ort. hamle) 20–60 → **12–30**; S6 (açgözlü bot) 150–800 → **45–120**. Yeni **S16**: tepsi planlayıcı bot (tepsinin 3 parçasını birlikte planlar) ort. hamle **150–400** (tahmin; ölçülen 184,1). Ayar yönergeleri tarama sonuçlarına göre düzeltildi: "S6/S9 yüksekse RAHATLATMA sığma 3 → 2, AÇIK B 13 → 15" kaldırıldı (etkisi ±%5, yön tutarsız); etkili düğmeler `NORMAL` B çarpanı ve RAHATLATMA doluluk eşiği. Denge değerleri (`CoreConfig` çarpanları ve eşikleri) **değişmedi**.
+- **Ertelenen ayar:** Oyunu uzatma (ilk aday `NormalLargeMul` 10 → 7: açgözlü +%6, planlayıcı +%39, mod payları aynı) gerçek oyuncu verisi gelene kadar ertelendi. Yeniden açma ölçütü (tahmin): gerçek oyuncu medyan oyun uzunluğu < 40 hamle veya oyuncu testinde "çok çabuk bitiyor" geri bildirimi.
+- **Gerekçe:** `docs/reports/m0-balance.md` (qa-tester): kesin kriterlerin hepsi geçti; S5 (16,9) ve S6 (54,4) kaldı, çünkü GDD'nin açgözlü botu ileriye bakmıyor ve v0.1 aralığı tepsi planlayan oyuncuyu varsayıyordu. Botlar gerçek oyuncunun yalnız alt/üst sınırını verir; hedef uzunluk oyuncu verisiyle belirlenmeli (İ1, İ5). §6.4 puan örnekleri (4/13/84/422/1) gerçekçi tahta durumlarıyla yeniden yazıldı; puanlar değişmedi.
+- **Sonuçlar:** Yeni sürümde S5/S6 geçer, S16 geçer (184,1). S7 (5,50) ve S12 (medyan 3) sınırda, her değişiklikte izlenir. Eski tohumların oyunları değişmez. Ayar yapılırsa aynı simülasyon komutuyla ölçülüp buraya yazılır.
+
+## 2026-10-12 — Core sağlamlık şartları (WeightProfile, anlık görüntü)
+
+- **Karar:** `WeightProfile` kurucusu `SmallMul ≥ 1` ve `MinFitting ≤ MaxSamePiecePerTray (2)` şartlarını zorlar. `GameSnapshot`'a `ClearedInCurrentTray` eklendi. `TraysDealt` ilk tepsiyi sayar (`= 1 + ⌊Moves/3⌋`). `FromSnapshot` tam dolu satır/sütunlu tahtayı ve tutarsız skor/istatistik alanlarını `ArgumentException` ile reddeder. Ayrıntı: GDD §9.
+- **Gerekçe:** Simülasyon hatası B1 (geçersiz profilde onarım adayı kalmıyor, `TryPlace` durumu yarım bırakıyor) ve B2 (bozuk kayıtta "hayalet" puan). Tepsi ortasında alınan kayıtta `T`'nin doğru hesaplanması için bayrak gerekli (S3).
+- **Sonuçlar:** §5.4 sığma garantisi her geçerli yapılandırmada sağlanır. Anlık görüntü sürümü/alan değişikliği Unity kayıt biçimini etkiler.
+
+## 2026-10-12 — "Yeni rekor!" kuralı
+
+- **Karar:** "Yeni rekor!" etiketi, oyun başlarken okunan rekora (`oyunBaşıRekor`) göre belirlenir: `sonSkor > oyunBaşıRekor`. Oyun sırasında veya arka plana alınırken rekor depoya yazılsa bile bu değer oyun boyunca değişmez. Sürdürülen oyunda Unity katmanı `oyunBaşıRekor`'u anlık görüntüyle birlikte saklar. HUD ve panel rekor alanı `max(oyunBaşıRekor, skor)` gösterir. Ayrıntı: GDD §7.2–7.3.
+- **Gerekçe:** Arka plana alma yazımı (GDD §7.3) rekoru oyun bitmeden günceller; depodaki güncel değerle karşılaştırılırsa oyuncu hak ettiği "Yeni rekor!" anını kaybeder (İ2: başarıya bağlı geri bildirim).
+- **Sonuçlar:** Core değişmez; kural Unity katmanında (UI/kayıt) uygulanır ve Unity Test Framework ile test edilir.

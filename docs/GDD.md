@@ -1,10 +1,17 @@
 # Blockbloom — Oyun Tasarım Belgesi (GDD)
 
-- **Sürüm:** v0.1 — 2026-10-12
+- **Sürüm:** v0.2 — 2026-10-12
 - **Kapsam:** M0 (çekirdek oyun, klasik mod). M1–M4 yalnızca §12'de listelenir.
 - **Sahibi:** game-designer. Değişiklikler `docs/decisions.md` ile eşlenir.
 - **İlke atıfları:** "İ1…İ8" = `CLAUDE.md` → *Tasarım ilkeleri* maddeleri.
 - Tüm sayılar başlangıç değeridir; §10'daki simülasyonla ayarlanır. Değiştirilebilir sabitler `KALIN_BÜYÜK` adla verilir; programcı bunları tek bir yapılandırma sınıfında toplar.
+
+### Değişiklik günlüğü
+
+| Sürüm | Tarih | Değişiklik |
+|---|---|---|
+| v0.2 | 2026-10-12 | M0 denge raporu (`docs/reports/m0-balance.md`) sonrası: §6.4 örnekleri gerçekçi tahta durumlarıyla yeniden yazıldı (puanlar aynı: 4/13/84/422/1). §7.2 "Yeni rekor!" oyun başında okunan rekora göre. §9: `GameSnapshot.ClearedInCurrentTray`, `TraysDealt` sayım kuralı, `WeightProfile` geçerlilik şartları, `FromSnapshot` doğrulamaları. §10: S5 → 12–30, S6 → 45–120, yeni S16 (planlayıcı bot 150–400); ayar yönergeleri ölçüme göre düzeltildi; "Ertelenen ayar" notu. Denge değerleri değişmedi. |
+| v0.1 | 2026-10-12 | İlk sürüm. |
 
 ---
 
@@ -188,7 +195,7 @@ AĞIRLIKLI_ÇEK(rng, liste, w):
   liste sırasıyla (§4 tablo sırası): r ← r − w(p); r < 0 ise p döndür
 ```
 
-**Garanti kanıtı:** Bir hamlenin patlatması sonrası tahtada en az bir boş hücre vardır (64 hücre dolarsa tüm satırlar dolu olur ve patlar). Dolayısıyla `M1` her zaman sığar; onarım adımında aday kümesi asla boş olmaz. `M1` en fazla 2 kez kuralı asgari 2 şartıyla çelişmez.
+**Garanti kanıtı:** Bir hamlenin patlatması sonrası tahtada en az bir boş hücre vardır (64 hücre dolarsa tüm satırlar dolu olur ve patlar). Dolayısıyla `M1` her zaman sığar; onarım adımında aday kümesi asla boş olmaz. `M1` en fazla 2 kez kuralı asgari 2 şartıyla çelişmez. Kanıt iki ön koşula dayanır ve `WeightProfile` kurucusu bunları zorlar (§9): K sınıf çarpanı ≥ 1 (`M1`'in ağırlığı > 0) ve asgari sığan ≤ 2 (aynı parça tavanı).
 
 **RNG tüketim sırası sabittir:** yuva 0, 1, 2 parça çekimleri → onarım çekimleri (sırayla) → renkler 0, 1, 2. Bu sıra değişirse eski tohumların oyunları değişir; değişiklik karar kaydı gerektirir.
 
@@ -220,17 +227,21 @@ AĞIRLIKLI_ÇEK(rng, liste, w):
 - Gerekçe: İ2 — en nadir ve en tatmin edici an, en üst kademe geri bildirim almalı. Çarpılmaması puan patlamasını sınırlar. Oyun başındaki boş tahta bonus vermez (yalnız patlatma sonucu boşalma sayılır).
 
 ### 6.4 Sayısal örnekler
-Her örnek bir öncekinin devamıdır; başlangıçta `K = 0`.
 
-| # | Durum | Hesap | Hamle puanı | K sonrası |
-|---|---|---|---|---|
-| 1 | `L4A` konur, patlatma yok | 4 | **4** | 0 |
-| 2 | `I3H` 1 satırı tamamlar | 3 + 10×1²×1 | **13** | 1 |
-| 3 | (Tepsi yenilendi — K korunur.) `O4` 1 satır + 1 sütun tamamlar (kesişim 1 hücre; 15 hücre boşalır) | 4 + 10×2²×2 | **84** | 2 |
-| 4 | `I2V` alt alta 2 satırı tamamlar; tahtada başka hücre kalmaz | 2 + 10×2²×3 + 300 | **422** | 3 |
-| 5 | `M1` konur, patlatma yok | 1 | **1** | 0 |
+Örnekler iki tahta zincirinden oluşur. Hücreler `(x, y)` (§2); `(a..b, y)` = y satırında `x = a…b` arası tüm hücreler; `(x, a..b)` = x sütununda `y = a…b` arası tüm hücreler. "Önce" sütunu hamleden **önceki** tahtanın tam listesidir (listede olmayan hücre boştur).
 
-Toplam: 524.
+- **Zincir A (adım 1–3):** tek tahtada art arda üç hamle. Adım 1 ile 2 aynı tepsinin son iki parçasıdır; adım 2'den sonra tepsi yenilenir, K korunur (§6.2).
+- **Zincir B (adım 4–5):** **ayrı** bir tahta. Adım 4'e girerken `K = 2` olduğu varsayılır (adım 3'ten devralınmış gibi; ör. bu oyunda önceki iki hamle patlatmış). Adım 4 adım 3'ün tahtasından gelemez: bir sütun patlatan hamle tüm satırlarda o sütunu boşaltır, bu yüzden hiçbir satır "tek domino uzaklıkta tam" kalamaz. Adım 5, adım 4'ün devamıdır.
+
+| # | K önce | Önce (dolu hücreler) | Hamle (çapa) | Sonuç | Hesap | Hamle puanı | K sonra |
+|---|---|---|---|---|---|---|---|
+| 1 | 0 | `(7,0..5)` 6 hücre; `(3..7,6)` 5 hücre; `(0..5,7)` 6 hücre — toplam 17 | `L4A` @ (1,1) → (1,1),(1,2),(1,3),(2,3) | Çizgi yok (sütun 7: 7/8, satır 6: 5/8, satır 7: 6/8) | 4 | **4** | 0 |
+| 2 | 0 | Adım 1 sonrası (21 hücre) | `I3H` @ (0,6) → (0,6),(1,6),(2,6) | Satır 6 dolar → 8 hücre boşalır. Sütun 7 hâlâ 7/8. Kalan 16 hücre. Tepsi yenilenir. | 3 + 10×1²×1 | **13** | 1 |
+| 3 | 1 | Adım 2 sonrası: L4A hücreleri + `(0..5,7)` + `(7,0..5)` | `O4` @ (6,6) → (6,6),(7,6),(6,7),(7,7) | Satır 7 ve sütun 7 dolar; kesişim (7,7) bir kez: 8+8−1 = **15** hücre boşalır. Kalan 5 hücre (L4A + (6,6)); tam temizlik yok. | 4 + 10×2²×2 | **84** | 2 |
+| 4 | 2 (varsayım) | `(0..2,6)`, `(4..7,6)`, `(0..2,7)`, `(4..7,7)` — satır 6 ve 7, x=3 hariç; toplam 14 | `I2V` @ (3,6) → (3,6),(3,7) | Satır 6 ve 7 dolar (sütun 3 yalnız 2/8) → 16 hücre boşalır, tahta boş → tam temizlik | 2 + 10×2²×3 + 300 | **422** | 3 |
+| 5 | 3 | Boş tahta (adım 4 sonrası) | `M1` @ (0,0) | Çizgi yok | 1 | **1** | 0 |
+
+Beş hamle puanının toplamı 524'tür; bu toplam iki zincirin aritmetik toplamıdır, tek bir oyunun skoru değildir. Testler her adımı yukarıdaki "Önce" tahtası ve "K önce" değeriyle ayrı ayrı kurar.
 
 ---
 
@@ -243,14 +254,17 @@ Toplam: 524.
 
 ### 7.2 Oyun sonu ekranında
 - Skor (büyük), kişisel rekor.
-- Skor > önceki rekor ise "Yeni rekor!" etiketi (eşitlik rekor sayılmaz).
+- **"Yeni rekor!" kuralı:** `oyunBaşıRekor` = oyun başlarken (`NewGame` anında) `IRecordStore.BestScore`'dan okunan değer. Etiket yalnız `sonSkor > oyunBaşıRekor` ise gösterilir (eşitlik rekor sayılmaz).
+  - Oyun sırasında rekor depoya yazılsa bile (ör. §7.3 arka plana alma yazımı) karşılaştırma **değişmez**: `oyunBaşıRekor` oyun boyunca sabit tutulur, depodan yeniden okunmaz. Aksi halde arka plana alınıp dönülen rekor oyununda etiket kaybolurdu.
+  - Panelde gösterilen "kişisel rekor" değeri `max(oyunBaşıRekor, sonSkor)`'dur.
+  - Yarıda kalan oyun anlık görüntüden sürdürülürse (§7.3, isteğe bağlı) Unity katmanı `oyunBaşıRekor`'u anlık görüntüyle birlikte kendi kaydında saklar ve sürdürmede onu kullanır; depodaki güncel rekoru kullanmaz. Core'da değişiklik gerekmez.
 - Bu oyunun istatistikleri: hamle sayısı, patlatılan toplam çizgi, en yüksek kombo.
 - Düğmeler: **Tekrar oyna** (tek dokunuş → yeni oyun, yeni tohum), **Menü**.
 
 ### 7.3 Kalıcı kayıt (cihazda, çevrimdışı — İ1)
 - Saklanan: `enYüksekSkor` (int), `oynananOyun` (int), `enYüksekKombo` (int).
 - Yazma anları: oyun sonu; ayrıca uygulama arka plana atılırken anlık skor rekoru aşmışsa rekor hemen yazılır (rekor kaybolmaz).
-- HUD: üstte anlık skor ve rekor; anlık skor rekoru geçince rekor alanı anlık skoru gösterir.
+- HUD: üstte anlık skor ve rekor; rekor alanı `max(oyunBaşıRekor, anlıkSkor)` gösterir (§7.2).
 - Depolama yöntemi Unity katmanının işidir (`IRecordStore` arayüzü, §9). Yarıda kalan oyunun kaydı (anlık görüntü) API'de hazırdır; M0'da UI'a bağlanması **isteğe bağlıdır** (açık soru).
 
 ---
@@ -335,6 +349,7 @@ sealed class DifficultyState
   void OnTrayCompleted(bool anyClearInTray)
 
 readonly struct WeightProfile { int SmallMul; int MediumMul; int LargeMul; int FitMul; int MinFitting; int MaxLarge; }
+  // Kurucu geçersiz değeri reddeder (ArgumentOutOfRangeException) — bkz. "WeightProfile geçerlilik şartları"
 
 static class Difficulty
   DifficultyMode Evaluate(int filledCount, DifficultyState s)   // §5.3
@@ -364,6 +379,7 @@ sealed class GameState
   static GameState NewGame(ulong seed)
   Grid Grid; Tray Tray; ScoreKeeper Scoring; DifficultyState Difficulty
   GameStats Stats; bool IsGameOver; ulong Seed
+  bool ClearedInCurrentTray                                     // mevcut tepside şu ana kadar patlatma oldu mu
   bool CanPlace(int slot, int ax, int ay)
   bool SlotFitsAnywhere(int slot)                               // soluk gösterim için
   MoveResult TryPlace(int slot, int ax, int ay)                 // §3.5'in tamamı
@@ -375,6 +391,7 @@ sealed class GameSnapshot                                       // düz veri, JS
   int Version; ulong Seed; ulong Bits; byte[64] Colors
   string?[3] TrayIds; byte[3] TrayColors
   int Score; int Combo; int MaxCombo; int TraysWithoutClear
+  bool ClearedInCurrentTray                                     // v0.2: tepsi ortasında alınan kayıtta T için gerekli
   ulong RngState; ulong RngInc; GameStats Stats
 
 interface IRecordStore                                          // Unity katmanı uygular
@@ -388,12 +405,36 @@ Davranış notları:
 - `NewGame`: boş tahta, `K=0`, `T=0`, ilk tepsi üretilir (mod `AÇIK`).
 - Core hiçbir zaman zaman/saat okumaz; tüm rastgelelik `IRandom`'dan gelir.
 
+**`TraysDealt` sayımı (v0.2):** İlk tepsi **sayılır**. `NewGame` sonrası `TraysDealt = 1`; her yenilemede +1. Yenileme her 3. başarılı hamlede olduğundan her an `TraysDealt = 1 + ⌊Moves / 3⌋` (oyun sonunda da). Simülasyon S4 bu eşitliği denetler.
+
+**`ClearedInCurrentTray` (v0.2):** Mevcut tepsideki hamlelerden en az biri çizgi patlattıysa `true`. Tepsi tamamlandığında `DifficultyState.OnTrayCompleted(ClearedInCurrentTray)` bununla çağrılır, yeni tepsiyle `false` olur. Anlık görüntü tepsi ortasında alınabildiği için bu bayrak kayda yazılmazsa sürdürülen oyunda `T` (§5.2) yanlış hesaplanır ve S3 (determinizm) bozulur. `GameState` bunu salt okunur özellik olarak da verir.
+
+**`WeightProfile` geçerlilik şartları (v0.2):** Kurucu aşağıdakilerden biri bozulursa `ArgumentOutOfRangeException` atar (yapılandırma hatası; oyun sırasında oluşmaz):
+
+| Alan | Şart | Gerekçe |
+|---|---|---|
+| `SmallMul` | ≥ 1 | `M1` (K sınıfı) her zaman sığar; ağırlığı > 0 kalmalı ki onarım adımında aday kümesi boş olmasın. |
+| `MediumMul`, `LargeMul` | ≥ 0 | 0 = o sınıf hiç gelmez (izinli). |
+| `FitMul` | ≥ 1 | — |
+| `MinFitting` | 0 ≤ değer ≤ `MaxSamePiecePerTray` (= 2) | Yalnız `M1`'in sığdığı tahtada `M1` bir tepside en fazla 2 kez gelebilir; 3 istenirse onarım aday bulamaz. |
+| `MaxLarge` | 0 ≤ değer ≤ 3 | — |
+
+Bu şartlar §5.4 garanti kanıtının ön koşuludur. Şartlar olmadan simülasyon (`docs/reports/m0-balance.md` §7 B1) `MinFitting = 3` veya `SmallMul = 0` ile `NextTray`'in istisna attığını ve `TryPlace` içinde durumu yarım bıraktığını gösterdi. Birim testi: her iki geçersiz profil kurucuda reddedilir; mevcut üç profil (§5.3) kabul edilir.
+
+**`FromSnapshot` doğrulamaları (v0.2):** Geçersiz kayıt `ArgumentException` ile reddedilir (Unity katmanı yakalar, kaydı siler, yeni oyun başlatır). Reddedilen durumlar:
+- Desteklenmeyen `Version`; tepsi dizileri 3 öğe değil; `Stats` boş; bilinmeyen parça kimliği.
+- **Tahtada tam dolu satır veya sütun** (oyunda hamle içinde hemen patlar; kayıtta olamaz — B2 "hayalet puan").
+- Tepsi tamamen boş (boş tepsi hamle içinde yenilenir); boş yuvanın rengi ≠ 0.
+- Tepsi 3 parça doluyken `ClearedInCurrentTray = true`.
+- `Score < 0`, `Combo < 0`, `MaxCombo < Combo`, `TraysWithoutClear < 0`, negatif istatistik, `TraysDealt < 1`, `Stats.MaxCombo ≠ MaxCombo`.
+- `IsGameOver` kayıttan okunmaz, durumdan yeniden hesaplanır.
+
 ---
 
 ## 10. Denge simülasyonu — kabul kriterleri (M0)
 
 **Kurulum (qa-tester, `tools/` altında dotnet konsol):**
-- Tohumlar `1..1000`, her tohum için iki bot: **Rastgele** ve **Açgözlü**. Toplam 2.000 oyun.
+- Tohumlar `1..1000`, her tohum için iki bot: **Rastgele** ve **Açgözlü**. Toplam 2.000 oyun (S15 süre ölçümü bu 2.000 oyuna göredir). v0.2'den itibaren ayrıca **Tepsi planlayıcı** bot (aşağıda) koşulur; S16 yalnız ona bakar.
 - **Rastgele bot:** `LegalMoves()` içinden tekdüze seçim; kendi `Pcg32(seed + 1_000_000)` örneğini kullanır (oyun RNG'sinden ayrı).
 - **Açgözlü bot:** her yasal hamlenin anlık `ScoreBreakdown.Total`'ını hesaplar, en büyüğünü seçer. Eşitlikte: hamle sonrası `FilledCount` küçük olan → yuva indeksi küçük → y küçük → x küçük. Tamamen deterministik.
 - Güvenlik sınırı: 5.000 hamle; aşan oyun "bitmedi" olarak kaydedilir.
@@ -402,7 +443,9 @@ Davranış notları:
 **Ölçülecek metrikler** (her biri için ortalama, medyan, p10, p90, p99):
 oyun başına hamle sayısı, skor, patlatılan çizgi, en yüksek kombo, tam temizlik sayısı; tepsi başına mod dağılımı; patlatan hamle oranı; çizgi sayısı dağılımı (n=1,2,3,4+); parça kimliği frekansı; tepsi üretim süresi.
 
-**Hedefler.** Kesin kriterler bağlayıcıdır; **tahmini aralıklar ilk tasarım tahminidir**, ilk simülasyondan sonra bu belgede güncellenir.
+**Ek bot (v0.2) — Tepsi planlayıcı:** tepside kalan parçaların tüm sıra × çapa kombinasyonlarını (kombo dahil puanla) birlikte arar; yaprak değeri = anlık puan + hareketlilik − 8 × tek hücrelik delik − 500 × tepside kalıp artık sığmayan parça; yerleştirilemeyen her parça −1000. Hareketlilik = hamle sonrası tahtaya sığan katalog parçalarının taban ağırlık toplamı (0..124). Deterministik. Tanımın referans uygulaması `tools/Blockbloom.Sim` içindedir (`docs/reports/m0-balance.md` §1). Açgözlü bot ileriye bakmadığı için gerçek, planlama yapan oyuncunun oyun uzunluğuna planlayıcı daha yakındır (İ1: derinlik tepsi planlamasından gelir).
+
+**Hedefler.** Kesin kriterler bağlayıcıdır. Tahmini aralıklar v0.2'de ilk simülasyon ölçümüne göre güncellendi (ölçülen değerler `docs/reports/m0-balance.md` §3).
 
 | # | Metrik | Hedef | Tür |
 |---|---|---|---|
@@ -410,8 +453,8 @@ oyun başına hamle sayısı, skor, patlatılan çizgi, en yüksek kombo, tam te
 | S2 | `RAHATLATMA` tepsilerinde sığan parça sayısı < 2 olan oran | **= 0** | Kesin |
 | S3 | Determinizm: aynı tohum + bot iki kez → aynı hamle ve skor dizisi; anlık görüntüden devam eden oyun kesintisizle aynı | **%100** | Kesin |
 | S4 | Puan muhasebesi: Σ hamle puanı = son skor; kesişimde `CellsCleared = 8n_r + 8n_c − n_r·n_c` | **%100** | Kesin |
-| S5 | Rastgele bot — oyun başına ortalama hamle | 20–60 | Tahmin |
-| S6 | Açgözlü bot — oyun başına ortalama hamle | 150–800 | Tahmin |
+| S5 | Rastgele bot — oyun başına ortalama hamle | 12–30 (v0.1: 20–60; ölçülen 16,9) | Tahmin |
+| S6 | Açgözlü bot — oyun başına ortalama hamle | 45–120 (v0.1: 150–800; ölçülen 54,4) | Tahmin |
 | S7 | Açgözlü / rastgele ortalama skor oranı | ≥ 5 (beceri fark yaratmalı — İ1) | Tahmin |
 | S8 | Açgözlü botta ilk 3 tepside (≤ 9 hamle) biten oyun oranı | ≤ %2 | Tahmin |
 | S9 | Açgözlü botta "bitmedi" (5.000 hamle) oranı | ≤ %1 (oyun sonsuz olmamalı) | Tahmin |
@@ -421,8 +464,23 @@ oyun başına hamle sayısı, skor, patlatılan çizgi, en yüksek kombo, tam te
 | S13 | Zorluk ayarı açık / kapalı, açgözlü ortalama hamle oranı | 1,15–2,0 (etkili ama oyunu bozmayan) | Tahmin |
 | S14 | NORMAL mod tepsilerinde parça frekansı ile `taban/124` farkı | her parça için ≤ 1,5 yüzde puanı (onarım hariç sayım) | Kesin |
 | S15 | Tepsi üretim süresi (geliştirme makinesi) | ortalama < 0,1 ms; 2.000 oyunun tamamı < 60 s | Kesin |
+| S16 | Tepsi planlayıcı bot — oyun başına ortalama hamle (1.000 tohum; tarama koşularında 300) | 150–400 (ölçülen 184,1) | Tahmin |
 
-**Ayar yönü (hedef dışı çıkarsa):** S6 düşükse → B ağırlıklarını ya da `RAHATLATMA` eşiğini (`dolu ≥ 32` → 28) düşür; S6/S9 yüksekse → `RAHATLATMA` sığma çarpanını 3 → 2 yap, `AÇIK` B çarpanını 13 → 15 yap. Her ayar `decisions.md`'ye yazılır.
+S7 (ölçülen 5,50) ve S12 (ölçülen medyan 3) sınırdadır; her denge değişikliğinden sonra özellikle izlenir.
+
+**Ayar yönü (hedef dışı çıkarsa).** Etkiler `docs/reports/m0-balance.md` §4 taramasından (ortalama hamle değişimi; açgözlü / planlayıcı):
+
+| Durum | Önce dene | Etki | Yan etki / dikkat |
+|---|---|---|---|
+| S6 veya S16 düşük (oyun kısa) | `NORMAL` B çarpanı 10 → 7 | açgözlü +%6, planlayıcı +%39 | Mod payları değişmez (S10 korunur). Beceriyi ödüllendirir (İ1). |
+| S6 hâlâ düşük | `RAHATLATMA` doluluk eşiği 32 → 28 | açgözlü +%20, planlayıcı +%28 | Açgözlüde RAHATLATMA payı %23 → %42: S10 üst sınırı (%35) aşılır. Uygulanırsa S10 aralığı aynı kararla güncellenir. 24'e inmez (RAHATLATMA %62, baskın mod olur). |
+| S6, S16 veya S9 yüksek (oyun uzun) | Yukarıdakilerin tersi: `NORMAL` B çarpanı 10 → 12–13; `RAHATLATMA` eşiği 32 → 34–36 | Ölçülmedi; yön simetrik varsayılır, uygulamadan önce taranır | RAHATLATMA payı düşer; S10 alt sınırı (%10) ve S8 izlenir. |
+| — | **Kullanma:** `RAHATLATMA` sığma çarpanı (×2 / ×5) ve `AÇIK` B çarpanı (×1,5) | ±%5, tutarsız yön (sığma ×2 oyunu **kısaltıyor**, ×5 karışık) | v0.1'deki "S6/S9 yüksekse sığma 3 → 2, AÇIK B 13 → 15" yönergesi kaldırıldı: etkisi gürültü düzeyinde. |
+| — | **Kullanma:** `T ≥ 2` → `T ≥ 1` | açgözlü +%5 | Rastgele botta RAHATLATMA payı %75; görünmezliği (İ5) zorlar. |
+
+Her ayar aynı simülasyon komutuyla (`docs/reports/m0-balance.md` §8) yeniden ölçülür ve `decisions.md`'ye yazılır. `CoreConfig` değeri değişirse eski tohumların oyunları değişir.
+
+**Ertelenen ayar (v0.2):** Denge değerleri (`CoreConfig` çarpanları ve eşikleri, §5.3) v0.2'de **değişmedi**. Oyunu uzatma ayarı (ilk aday `NormalLargeMul` 10 → 7) gerçek oyuncu verisi gelene kadar ertelendi. Gerekçe: botlar gerçek oyuncunun oyun uzunluğunu yalnız sınırlar (açgözlü alt, planlayıcı üst tahmin); hangi uzunluğun "tatmin edici" olduğu M1 telefon testi ve M3 analitiği (oyun uzunluğu, kopma anı) ile belirlenir. Yeniden açma ölçütü: gerçek oyuncu medyan oyun uzunluğu < 40 hamle veya oyuncu testinde "çok çabuk bitiyor" geri bildirimi.
 
 ---
 
@@ -442,6 +500,9 @@ oyun başına hamle sayısı, skor, patlatılan çizgi, en yüksek kombo, tam te
 | Bit tahtası, < 0,1 ms üretim | §5.4, §9 | İ8 |
 | Sığmayan parça soluk; geniş dokunma alanı; esnek çapa | §8 | İ1 |
 | Oyun sonunda reklam/devam yok | §7 | İ6 |
+| "Yeni rekor!" oyun başındaki rekora göre; oyun içi kayıt etiketi silmez (v0.2) | §7.2 | İ2 (başarıya bağlı geri bildirim kaybolmaz) |
+| `WeightProfile` şartları: K çarpanı ≥ 1, asgari sığan ≤ 2 (v0.2) | §5.4, §9 | İ5 (garanti her yapılandırmada geçerli) |
+| S5/S6 ölçüme göre; planlayıcı bot S16; denge ayarı ertelendi (v0.2) | §10 | İ1, İ5 |
 
 ---
 
